@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/google-sync",
+      "path": "/api/cron/integrations-sync",
       "schedule": "*/15 * * * *"
     }
   ]
