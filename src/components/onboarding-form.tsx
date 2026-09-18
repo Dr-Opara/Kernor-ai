@@ -92,8 +92,6 @@ export default function OnboardingForm({ fullName }: { fullName?: string | null 
       min_match_score: 85,
     });
 
-    await supabase.from("credit_balances").upsert({ user_id: user.id });
-
     if (profileResult.error || preferenceResult.error) {
       setError(profileResult.error?.message || preferenceResult.error?.message || "Could not save your profile.");
       setBusy(false);
