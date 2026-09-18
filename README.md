@@ -221,7 +221,7 @@ Each application freezes:
 - the exact job context
 - the exact approved resume used
 
-The application timeline stores system, user, Gmail, and Calendar events in one history.
+The application timeline stores system, user, Email, and Calendar events in one history.
 
 ### User experience
 
@@ -235,7 +235,7 @@ The application timeline stores system, user, Gmail, and Calendar events in one 
 
 ## Google Interview Detection v0.7
 
-Phase 7 connects read-only Gmail and Google Calendar context to Kernor Track.
+Phase 7 connects read-only Email and Google Calendar context to Kernor Track.
 
 ### Detection
 
@@ -262,7 +262,7 @@ Ambiguous messages are not allowed to silently move an application.
 ### Access
 
 Phase 7 requests only:
-- Gmail read-only
+- Email read-only
 - Google Calendar events read-only
 
 See `docs/integrations/google.md` for Vercel Connect configuration.
