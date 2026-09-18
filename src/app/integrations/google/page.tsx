@@ -72,7 +72,7 @@ export default async function GoogleIntegrationPage({
           Let Kernor watch for the next step.
         </h1>
         <p className="muted" style={{ fontSize: 18, lineHeight: 1.6, margin: 0 }}>
-          Connect Gmail and Google Calendar so Kernor can detect recruiter responses,
+          Connect Email and Google Calendar so Kernor can detect recruiter responses,
           assessments, interview invitations, and scheduled interviews.
         </p>
 
@@ -85,7 +85,7 @@ export default async function GoogleIntegrationPage({
               {isConnected ? "Google is connected." : "Connect your Google account."}
             </h2>
             <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>
-              Kernor requests read-only Gmail and Calendar access for detection. It does
+              Kernor requests read-only Email and Calendar access for detection. It does
               not send, delete, or edit email or calendar events in this phase.
             </p>
           </div>
