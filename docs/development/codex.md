@@ -1,64 +1,100 @@
 # Developing Kernor with Codex in VS Code
 
-Kernor is designed to be developed primarily in the repository with Codex.
+Kernor v0.1-v0.11 has been feature-built. The next Codex phase is **integration and stabilization**, not greenfield feature development.
 
-## Recommended workflow
+Before changing code, read:
 
-1. Clone the repository locally.
-2. Open the repository root in VS Code.
-3. Install the official **Codex** extension from OpenAI.
-4. Sign in with the same ChatGPT account/workspace you use for Codex.
-5. Open the Kernor repository root so Codex can read `AGENTS.md`.
-6. Work from a feature branch, never directly from `main`.
-7. Give Codex one product milestone at a time.
-8. Let Codex inspect the relevant files before making changes.
-9. Require Codex to run:
-   - `npm install`
-   - `npm run build`
-   - `npm run lint`
-10. Review the diff before pushing or opening a PR.
+1. `AGENTS.md`
+2. `docs/development/integration-audit.md`
+3. `README.md`
 
-## Environment
+## Recommended starting branch
 
-Create `.env.local` from `.env.example`.
+Start from:
 
-Never commit:
-- OpenAI API keys
-- Supabase secret/service-role keys
-- Stripe secret keys
-- OAuth client secrets
+```bash
+git checkout build/kernor-post-interview-v0.11
+git pull
+git checkout -b stabilize/kernor-v0.11
+```
 
-## Suggested first prompt in a new Codex session
+Do not merge the 11 stacked milestone PRs into `main` before the stabilization branch builds and passes tests.
 
-Read `AGENTS.md`, `README.md`, and the current open feature branch before making changes.
+## First local commands
 
-You are working on Kernor, a calm AI career product. Preserve the existing product rules and visual simplicity. Do not fabricate candidate information. Keep Supabase RLS intact. Before finishing, run the build and lint checks and summarize the files changed, tests run, and any remaining risks.
+Use the repository's selected package manager after installation creates its lockfile.
 
-## Feature prompt pattern
+```bash
+npm install
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-Use this structure for larger tasks:
+Commit the generated lockfile.
 
-**Goal**
-What the user should be able to do.
+Then start the app:
 
-**Current behavior**
-What exists today.
+```bash
+npm run dev
+```
 
-**Required behavior**
-The exact user flow and acceptance criteria.
+## Supabase is the first infrastructure task
 
-**Constraints**
-Security, product, design, and data rules.
+The current remote database contains the working schema, but there are no committed migrations and no Supabase migration history.
 
-**Done when**
-Build passes, lint passes, primary flow works, and the change is ready for review.
+Use the Supabase CLI from the project root to link the project and create a clean baseline from the current remote schema. Follow the current CLI help/docs rather than guessing command flags.
 
-## Current product sequence
+Afterward:
 
-- v0.1 — foundation/auth/onboarding/dashboard
+- verify migrations locally
+- create a fresh database from migrations
+- generate TypeScript database types
+- wire those types into browser/server/service clients
+- run security and performance advisors again
+
+## Codex first prompt
+
+Use this prompt after opening the stabilization branch:
+
+> Read AGENTS.md, docs/development/integration-audit.md, README.md, package.json, and the current branch before editing anything. Kernor v0.1-v0.11 is already feature-built. Your job is to stabilize it for a real local build and Vercel Preview deployment without redesigning the product. Start with P0 items only. Install dependencies and commit a lockfile, run lint/typecheck/build, fix compile errors, baseline the current Supabase remote schema into reproducible migrations, generate Supabase TypeScript types, add tests/CI, fix the documented Kernor Live state/WebRTC/order/graceful-close issues, and make Apply successful-submission plus credit accounting atomic. Preserve all product/security rules in AGENTS.md. Report every change, command run, test result, and remaining blocker.
+
+## External services
+
+Connect services only after the local build and database baseline are stable:
+
+- Supabase
+- Vercel
+- OpenAI / Realtime
+- Stripe
+- Browserbase
+- Google OAuth
+- Microsoft OAuth
+- Yahoo OAuth
+- optional outbound email connectors
+
+Use Vercel Preview first. Keep Production credentials separate.
+
+## Git workflow
+
+- Never commit directly to `main`.
+- Make stabilization changes on `stabilize/kernor-v0.11`.
+- Review diffs before commit.
+- Require passing build/lint/typecheck/tests before opening the final PR.
+- Prefer one consolidated stabilization PR to `main` after the stacked feature chain has been validated.
+
+## Product sequence already implemented
+
+- v0.1 — Foundation / Auth / Onboarding
 - v0.2 — Match
 - v0.3 — Resume Tailoring
-- next — Stripe/credits
-- then — controlled application browser
-- then — tracking and interview detection
-- then — interview workspace / Kernor Live
+- v0.4 — Credits + Stripe
+- v0.5 — Kernor Apply
+- v0.6 — Kernor Track
+- v0.7 — Provider-neutral Email + Calendar
+- v0.8 — Interview Workspace / Readiness
+- v0.9 — Multi-Round Interview Memory
+- v0.10 — Kernor Live
+- v0.11 — Post-Interview Analysis + Follow-Up
+
+The next milestone is **v0.11 stabilization + Preview deployment**, not v0.12 feature expansion.
