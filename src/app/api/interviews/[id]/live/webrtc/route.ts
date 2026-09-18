@@ -121,14 +121,23 @@ export async function POST(
       })
       .eq("id", liveSession.id);
 
-    return new NextResponse(body || "OpenAI Realtime session creation failed.", {
-      status: response.status,
-      headers: { "Content-Type": response.headers.get("content-type") || "application/json" },
-    });
+    return NextResponse.json(
+      {
+        error: "OpenAI Realtime session creation failed.",
+        detail: body.slice(0, 1000),
+      },
+      { status: response.status }
+    );
   }
 
-  return new NextResponse(body, {
-    status: 201,
-    headers: { "Content-Type": "application/json" },
-  });
+  return NextResponse.json(
+    {
+      sdp: body,
+      id:
+        response.headers.get("openai-session-id") ||
+        response.headers.get("x-request-id") ||
+        `realtime:${liveSession.id}`,
+    },
+    { status: 201 }
+  );
 }
