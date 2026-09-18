@@ -6,10 +6,10 @@ Kernor uses Vercel Connect with a generic Google OAuth connector.
 
 Configure the connector with the narrow read-only scopes:
 
-- `https://www.googleapis.com/auth/gmail.readonly`
+- `https://www.googleapis.com/auth/email.readonly`
 - `https://www.googleapis.com/auth/calendar.events.readonly`
 
-Phase 7 does not need Gmail send/modify or Calendar write access.
+Phase 7 does not need Email send/modify or Calendar write access.
 
 ## Environment
 
@@ -23,7 +23,7 @@ The Vercel deployment also needs Vercel OIDC enabled so `@vercel/connect` can ex
 
 ## Sync behavior
 
-- Gmail: bounded recent search, max 25 candidate messages per sync
+- Email: bounded recent search, max 25 candidate messages per sync
 - Calendar: primary calendar, 7 days back through 90 days ahead
 - Signals are deduplicated by Google external ID
 - Ambiguous items do not change the application status
