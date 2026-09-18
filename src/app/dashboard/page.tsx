@@ -1,98 +1,122 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 
-const applications = [
-  { company:"Centene", role:"Senior Compliance Analyst", status:"Interview", tone:"#eaf4ef" },
-  { company:"Microsoft", role:"GRC Manager", status:"Applied", tone:"#f3f3ef" },
-  { company:"AWS", role:"Security Manager", status:"Waiting", tone:"#f3f3ef" },
-  { company:"CrowdStrike", role:"GRC Lead", status:"Review resume", tone:"#fff6e8" },
-];
+function firstName(name?: string | null) {
+  return name?.trim().split(/\s+/)[0] || "there";
+}
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const supabase = await createClient();
+  const { data: auth } = await supabase.auth.getClaims();
+  const userId = auth?.claims?.sub;
+
+  if (!userId) redirect("/login");
+
+  const [{ data: profile }, { data: credits }, { data: jobs }, { data: applications }, { data: interviews }] = await Promise.all([
+    supabase.from("profiles").select("full_name,onboarding_completed").eq("id", userId).maybeSingle(),
+    supabase.from("credit_balances").select("application_credits,interview_passes").eq("user_id", userId).maybeSingle(),
+    supabase.from("job_opportunities").select("id,company_name,role_title,location,match_score,status").order("match_score", { ascending: false }).limit(1),
+    supabase.from("applications").select("id,company_name,role_title,status,last_event_at").order("last_event_at", { ascending: false }).limit(4),
+    supabase.from("interviews").select("id,stage,scheduled_at,status,meeting_provider,application_id").in("status", ["invited","scheduled","ready"]).order("scheduled_at", { ascending: true }).limit(1),
+  ]);
+
+  if (!profile?.onboarding_completed) redirect("/onboarding");
+
+  const bestJob = jobs?.[0];
+  const nextInterview = interviews?.[0];
+
   return (
     <main>
-      <header style={{height:74,borderBottom:"1px solid var(--line)",background:"rgba(247,247,245,.94)"}}>
-        <div className="shell" style={{height:"100%",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <Link href="/" style={{fontSize:22,fontWeight:800,letterSpacing:"-0.04em"}}>Kernor</Link>
-          <nav style={{display:"flex",gap:28,fontSize:14,fontWeight:650}}>
+      <header className="app-header">
+        <div className="shell app-header-inner">
+          <Link href="/" className="wordmark">Kernor</Link>
+          <nav className="app-nav">
             <Link href="/dashboard">Home</Link>
             <Link href="/applications">Applications</Link>
             <Link href="/interviews">Interviews</Link>
             <Link href="/profile">Profile</Link>
           </nav>
-          <div style={{display:"flex",gap:10,alignItems:"center"}}>
-            <span className="muted" style={{fontSize:14}}>25 credits</span>
-            <div style={{width:34,height:34,borderRadius:"50%",background:"#deded8",display:"grid",placeItems:"center",fontSize:13,fontWeight:800}}>EO</div>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <span className="muted" style={{ fontSize: 14 }}>{credits?.application_credits ?? 0} credits</span>
+            <div className="avatar">{firstName(profile?.full_name).slice(0, 1).toUpperCase()}</div>
           </div>
         </div>
       </header>
 
-      <section className="shell" style={{padding:"64px 0 90px"}}>
-        <div style={{display:"flex",justifyContent:"space-between",gap:24,alignItems:"end"}}>
+      <section className="shell" style={{ padding: "64px 0 90px" }}>
+        <div className="dashboard-heading">
           <div>
-            <div className="muted" style={{fontSize:14}}>Thursday, September 17</div>
-            <h1 style={{fontSize:46,letterSpacing:"-0.05em",margin:"8px 0 0"}}>Good evening, Emmanuel.</h1>
-            <p className="muted" style={{fontSize:18,marginTop:12}}>Here's what needs your attention.</p>
+            <h1 style={{ fontSize: 46, letterSpacing: "-0.05em", margin: 0 }}>Good to see you, {firstName(profile?.full_name)}.</h1>
+            <p className="muted" style={{ fontSize: 18, marginTop: 12 }}>
+              {bestJob || applications?.length || nextInterview ? "Here’s what needs your attention." : "Kernor is ready for your first move."}
+            </p>
           </div>
           <button className="btn btn-primary">Find jobs</button>
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"1.25fr .75fr",gap:18,marginTop:38}}>
-          <div className="card" style={{padding:28}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <div>
-                <div className="muted" style={{fontSize:13}}>Recommended for you</div>
-                <h2 style={{fontSize:28,letterSpacing:"-0.025em",margin:"8px 0 4px"}}>Senior GRC Manager</h2>
-                <div className="muted">Aperture Systems · Remote</div>
+        <div className="dashboard-main-grid">
+          <div className="card" style={{ padding: 28 }}>
+            {bestJob ? (
+              <>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 20, alignItems: "center" }}>
+                  <div>
+                    <div className="muted" style={{ fontSize: 13 }}>Best current match</div>
+                    <h2 style={{ fontSize: 28, margin: "8px 0 4px" }}>{bestJob.role_title}</h2>
+                    <div className="muted">{bestJob.company_name}{bestJob.location ? ` · ${bestJob.location}` : ""}</div>
+                  </div>
+                  <div style={{ fontSize: 32, fontWeight: 800 }}>{bestJob.match_score ?? "—"}%</div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 28 }}>
+                  <button className="btn btn-primary">View match</button>
+                </div>
+              </>
+            ) : (
+              <div style={{ padding: "22px 0" }}>
+                <div className="badge">Ready when you are</div>
+                <h2 style={{ fontSize: 30, margin: "18px 0 8px" }}>Find your first strong match.</h2>
+                <p className="muted" style={{ maxWidth: 520, lineHeight: 1.6 }}>
+                  Kernor will only surface roles that fit the profile and preferences you approved.
+                </p>
+                <button className="btn btn-primary" style={{ marginTop: 14 }}>Find jobs</button>
               </div>
-              <div style={{textAlign:"right"}}>
-                <div style={{fontSize:32,fontWeight:800}}>94%</div>
-                <div className="muted" style={{fontSize:12}}>match</div>
-              </div>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,margin:"26px 0"}}>
-              {["Experience","GRC skills","Certifications","Remote preference"].map(x=><div key={x} style={{padding:14,borderRadius:12,background:"#f5f5f2",fontSize:14}}>✓ {x}</div>)}
-            </div>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:20,borderTop:"1px solid var(--line)"}}>
-              <span className="muted">7 resume improvements available</span>
-              <button className="btn btn-primary">View match</button>
-            </div>
+            )}
           </div>
 
-          <div className="card" style={{padding:28}}>
-            <div className="muted" style={{fontSize:13}}>Upcoming interview</div>
-            <h2 style={{fontSize:24,margin:"10px 0 4px"}}>Senior Compliance Analyst</h2>
-            <div className="muted">Centene</div>
-            <div style={{margin:"28px 0",display:"grid",gap:10,fontSize:14}}>
-              <div>Thursday · 2:00 PM</div>
-              <div>Microsoft Teams</div>
-              <div style={{color:"var(--accent)",fontWeight:700}}>Workspace ready ✓</div>
-            </div>
-            <Link href="/interviews" className="btn btn-secondary" style={{width:"100%"}}>Open interview</Link>
+          <div className="card" style={{ padding: 28 }}>
+            <div className="muted" style={{ fontSize: 13 }}>Upcoming interview</div>
+            {nextInterview ? (
+              <>
+                <h2 style={{ fontSize: 24, margin: "10px 0 4px" }}>{nextInterview.stage || "Interview"}</h2>
+                <div className="muted">{nextInterview.meeting_provider || "Meeting details pending"}</div>
+                <div style={{ margin: "28px 0", fontSize: 14 }}>
+                  {nextInterview.scheduled_at ? new Date(nextInterview.scheduled_at).toLocaleString() : "Time pending"}
+                </div>
+                <Link href="/interviews" className="btn btn-secondary" style={{ width: "100%" }}>Open interview</Link>
+              </>
+            ) : (
+              <div style={{ paddingTop: 18 }}>
+                <h2 style={{ fontSize: 24, margin: "10px 0 6px" }}>Nothing scheduled.</h2>
+                <p className="muted" style={{ lineHeight: 1.55 }}>When an interview arrives, it will appear here automatically.</p>
+              </div>
+            )}
           </div>
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"0.72fr 1.28fr",gap:18,marginTop:18}}>
-          <div className="card" style={{padding:26}}>
-            <div className="muted" style={{fontSize:13}}>Today</div>
-            <div style={{display:"grid",gap:20,marginTop:20}}>
-              <div><strong>3</strong><div className="muted" style={{fontSize:14,marginTop:3}}>new strong matches</div></div>
-              <div><strong>2</strong><div className="muted" style={{fontSize:14,marginTop:3}}>applications submitted</div></div>
-              <div><strong>1</strong><div className="muted" style={{fontSize:14,marginTop:3}}>action needed</div></div>
-            </div>
+        <div className="card" style={{ padding: 26, marginTop: 18 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2 style={{ fontSize: 20, margin: 0 }}>Applications</h2>
+            <Link className="muted" href="/applications" style={{ fontSize: 14 }}>View all</Link>
           </div>
 
-          <div className="card" style={{padding:26}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-              <h2 style={{fontSize:20,margin:0}}>Applications</h2>
-              <Link className="muted" href="/applications" style={{fontSize:14}}>View all</Link>
+          {applications?.length ? applications.map((application) => (
+            <div key={application.id} className="application-row">
+              <div><strong>{application.company_name}</strong><div className="muted" style={{ fontSize: 14, marginTop: 4 }}>{application.role_title}</div></div>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{application.status.replaceAll("_", " ")}</span>
             </div>
-            {applications.map((a)=>(
-              <div key={a.company} style={{display:"grid",gridTemplateColumns:"1fr auto",gap:20,alignItems:"center",padding:"16px 0",borderTop:"1px solid var(--line)"}}>
-                <div><strong>{a.company}</strong><div className="muted" style={{fontSize:14,marginTop:4}}>{a.role}</div></div>
-                <span style={{fontSize:13,fontWeight:700,background:a.tone,padding:"7px 10px",borderRadius:999}}>{a.status}</span>
-              </div>
-            ))}
-          </div>
+          )) : (
+            <div className="muted" style={{ padding: "26px 0 8px" }}>No applications yet. Your submitted applications will stay organized here.</div>
+          )}
         </div>
       </section>
     </main>
