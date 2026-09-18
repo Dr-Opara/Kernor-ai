@@ -117,9 +117,14 @@ export default function ApplyRunControls({
         </div>
 
         {error ? <div className="apply-error">{error}</div> : null}
-        <button className="btn btn-primary" onClick={resolve} disabled={busy}>
-          {busy ? "Saving…" : "Save & continue"}
-        </button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="btn btn-primary" onClick={resolve} disabled={busy}>
+            {busy ? "Saving…" : "Save & continue"}
+          </button>
+          <button className="btn btn-secondary" onClick={() => command("cancel")} disabled={busy}>
+            Cancel application
+          </button>
+        </div>
       </div>
     );
   }
@@ -128,9 +133,14 @@ export default function ApplyRunControls({
     return (
       <div>
         {error ? <div className="apply-error">{error}</div> : null}
-        <button className="btn btn-primary" onClick={() => command("continue")} disabled={busy}>
-          {busy ? "Checking page…" : "I’m done — continue"}
-        </button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="btn btn-primary" onClick={() => command("continue")} disabled={busy}>
+            {busy ? "Checking page…" : "I’m done — continue"}
+          </button>
+          <button className="btn btn-secondary" onClick={() => command("cancel")} disabled={busy}>
+            Cancel application
+          </button>
+        </div>
       </div>
     );
   }
@@ -139,9 +149,14 @@ export default function ApplyRunControls({
     return (
       <div>
         {error ? <div className="apply-error">{error}</div> : null}
-        <button className="btn btn-primary" onClick={() => command("submit")} disabled={busy}>
-          {busy ? "Submitting…" : "Submit application"}
-        </button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="btn btn-primary" onClick={() => command("submit")} disabled={busy}>
+            {busy ? "Submitting…" : "Submit application"}
+          </button>
+          <button className="btn btn-secondary" onClick={() => command("cancel")} disabled={busy}>
+            Cancel
+          </button>
+        </div>
       </div>
     );
   }
