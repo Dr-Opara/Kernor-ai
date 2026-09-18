@@ -52,9 +52,6 @@ export async function signup(formData: FormData) {
       id: data.user!.id,
       full_name: fullName,
     });
-    await supabase.from("credit_balances").upsert({
-      user_id: data.user!.id,
-    });
     redirect("/onboarding");
   }
 
