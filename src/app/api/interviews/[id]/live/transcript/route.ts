@@ -10,6 +10,15 @@ const schema = z.object({
   transcript: z.string().trim().min(1).max(12000),
   mode: z.enum(["default","star","shorter","technical","follow_up","manual"]).default("default"),
   forceGuidance: z.boolean().default(false),
+  // Client-assigned, monotonically increasing per session — assigned the
+  // first time an item is observed (e.g. on its first delta), not when its
+  // completion event happens to arrive. Realtime completion events are not
+  // guaranteed to arrive in chronological order, and concurrent requests to
+  // this route are not guaranteed to be processed in dispatch order either,
+  // so `occurred_at` is derived from this index (see below) rather than
+  // insert-time `now()`, keeping transcript order stable regardless of
+  // network/processing timing.
+  turnIndex: z.number().int().min(0).optional(),
 });
 
 export async function POST(
@@ -36,7 +45,7 @@ export async function POST(
 
   const { data: liveSession } = await service
     .from("live_interview_sessions")
-    .select("id,status,context_snapshot")
+    .select("id,status,context_snapshot,activated_at,created_at")
     .eq("id", input.sessionId)
     .eq("interview_id", id)
     .eq("user_id", userId)
@@ -56,6 +65,13 @@ export async function POST(
   let transcriptItemId = existing.data?.id || null;
 
   if (!transcriptItemId) {
+    const sessionStart =
+      liveSession.activated_at || liveSession.created_at || new Date().toISOString();
+    const occurredAt =
+      input.turnIndex !== undefined
+        ? new Date(new Date(sessionStart).getTime() + input.turnIndex).toISOString()
+        : undefined;
+
     const { data: inserted, error } = await service
       .from("live_transcript_items")
       .insert({
@@ -63,6 +79,7 @@ export async function POST(
         user_id: userId,
         realtime_item_id: input.itemId,
         transcript: input.transcript,
+        ...(occurredAt ? { occurred_at: occurredAt } : {}),
       })
       .select("id")
       .single();

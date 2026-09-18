@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { canStartLive, createTurnSequencer } from "@/lib/live/session-state";
+import { waitForIceGatheringComplete, waitForPeerConnected } from "@/lib/live/webrtc-timing";
 
 type CaptureMode = "microphone" | "shared_audio" | "mixed";
 type GuidanceMode = "default" | "star" | "shorter" | "technical" | "follow_up" | "manual";
@@ -21,7 +23,13 @@ type TranscriptItem = {
   transcript: string;
   isQuestion: boolean;
   questionText?: string | null;
+  turnIndex: number;
 };
+
+// How long to keep the data channel open after the candidate stops sending
+// new audio, so an in-flight transcription-completed event for whatever
+// was already said can still arrive and be persisted before teardown.
+const END_DRAIN_MS = 1200;
 
 function extractSessionId(payload: any) {
   return (
@@ -31,6 +39,10 @@ function extractSessionId(payload: any) {
     payload?.client_secret?.id ||
     "realtime"
   );
+}
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
 
 async function createCaptureStream(mode: CaptureMode) {
@@ -123,8 +135,9 @@ export default function KernorLiveClient({
   const streamRef = useRef<MediaStream | null>(null);
   const partialRef = useRef<Record<string, string>>({});
   const manualRequestIdRef = useRef(0);
+  const turnSequencerRef = useRef(createTurnSequencer());
 
-  const canStart = consent && interviewPasses > 0 && state === "idle";
+  const canStart = canStartLive(state, consent, interviewPasses);
 
   const modeCopy = useMemo(() => {
     if (captureMode === "shared_audio") {
@@ -136,14 +149,20 @@ export default function KernorLiveClient({
     return "Uses only your microphone. This may not capture the interviewer clearly.";
   }, [captureMode]);
 
+  const turnIndexFor = useCallback(
+    (itemId: string) => turnSequencerRef.current.turnIndexFor(itemId),
+    []
+  );
+
   const saveTranscriptAndGuide = useCallback(
     async (
+      sid: string,
       itemId: string,
       transcript: string,
       mode: GuidanceMode = "default",
       forceGuidance = false
     ) => {
-      if (!sessionId) return null;
+      const turnIndex = turnIndexFor(itemId);
 
       const response = await fetch(
         `/api/interviews/${interviewId}/live/transcript`,
@@ -151,11 +170,12 @@ export default function KernorLiveClient({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            sessionId,
+            sessionId: sid,
             itemId,
             transcript,
             mode,
             forceGuidance,
+            turnIndex,
           }),
         }
       );
@@ -170,11 +190,14 @@ export default function KernorLiveClient({
         transcript,
         isQuestion: Boolean(data.isQuestion),
         questionText: data.questionText || null,
+        turnIndex,
       };
 
       setTranscripts((current) => {
         const without = current.filter((entry) => entry.itemId !== itemId);
-        return [...without, item].slice(-20);
+        return [...without, item]
+          .sort((a, b) => a.turnIndex - b.turnIndex)
+          .slice(-20);
       });
 
       if (data.guidance) {
@@ -184,54 +207,88 @@ export default function KernorLiveClient({
 
       return data;
     },
-    [interviewId, sessionId]
+    [interviewId, turnIndexFor]
   );
 
-  async function handleRealtimeEvent(event: any) {
-    const type = String(event?.type || "");
-    const itemId = String(
-      event?.item_id || event?.item?.id || event?.id || "segment-" + Date.now()
-    );
+  // Takes the prepared session id as an explicit parameter rather than
+  // reading it from component state. The data-channel message listener
+  // that calls this is registered once, inside startLive(), so a version
+  // that closed over the `sessionId` state variable would be permanently
+  // frozen at whatever that state held during that one render (typically
+  // still null, since setSessionId's update hasn't been re-rendered into
+  // scope yet) — silently dropping every transcript for the rest of the
+  // session. `sid` here is a plain local value from the same startLive()
+  // call, so it can't go stale.
+  const handleRealtimeEvent = useCallback(
+    async (sid: string, event: any) => {
+      const type = String(event?.type || "");
+      const itemId = String(
+        event?.item_id ||
+          event?.item?.id ||
+          event?.id ||
+          "segment-" + ++manualRequestIdRef.current
+      );
+      turnIndexFor(itemId);
 
-    if (
-      type === "conversation.item.input_audio_transcription.delta" ||
-      type === "input_audio_transcription.delta"
-    ) {
-      partialRef.current[itemId] =
-        (partialRef.current[itemId] || "") + String(event?.delta || "");
-      return;
-    }
-
-    if (
-      type === "conversation.item.input_audio_transcription.completed" ||
-      type === "input_audio_transcription.completed"
-    ) {
-      const transcript = String(
-        event?.transcript ||
-          event?.item?.content?.[0]?.transcript ||
-          partialRef.current[itemId] ||
-          ""
-      ).trim();
-
-      delete partialRef.current[itemId];
-
-      if (!transcript) return;
-
-      try {
-        await saveTranscriptAndGuide(itemId, transcript);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Kernor could not process a transcript segment."
-        );
+      if (
+        type === "conversation.item.input_audio_transcription.delta" ||
+        type === "input_audio_transcription.delta"
+      ) {
+        partialRef.current[itemId] =
+          (partialRef.current[itemId] || "") + String(event?.delta || "");
+        return;
       }
-    }
 
-    if (type === "error") {
-      setError(event?.error?.message || "Realtime transcription reported an error.");
-    }
-  }
+      if (
+        type === "conversation.item.input_audio_transcription.completed" ||
+        type === "input_audio_transcription.completed"
+      ) {
+        const transcript = String(
+          event?.transcript ||
+            event?.item?.content?.[0]?.transcript ||
+            partialRef.current[itemId] ||
+            ""
+        ).trim();
+
+        delete partialRef.current[itemId];
+
+        if (!transcript) return;
+
+        try {
+          await saveTranscriptAndGuide(sid, itemId, transcript);
+        } catch (err) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Kernor could not process a transcript segment."
+          );
+        }
+        return;
+      }
+
+      if (type === "error") {
+        setError(event?.error?.message || "Realtime transcription reported an error.");
+      }
+    },
+    [saveTranscriptAndGuide, turnIndexFor]
+  );
+
+  const cleanupConnection = useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    channelRef.current?.close();
+    peerRef.current?.close();
+    streamRef.current = null;
+    peerRef.current = null;
+    channelRef.current = null;
+  }, []);
+
+  // Release any open capture/connection if the user navigates away without
+  // explicitly ending the session.
+  useEffect(() => {
+    return () => {
+      cleanupConnection();
+    };
+  }, [cleanupConnection]);
 
   async function startLive() {
     if (!canStart) return;
@@ -242,6 +299,7 @@ export default function KernorLiveClient({
 
     let stream: MediaStream | null = null;
     let peer: RTCPeerConnection | null = null;
+    let dataChannel: RTCDataChannel | null = null;
 
     try {
       const prepareResponse = await fetch(
@@ -273,13 +331,13 @@ export default function KernorLiveClient({
         peer.addTrack(track, stream);
       }
 
-      const dataChannel = peer.createDataChannel("oai-events");
+      dataChannel = peer.createDataChannel("oai-events");
       channelRef.current = dataChannel;
 
       dataChannel.addEventListener("message", (message) => {
         try {
           const event = JSON.parse(message.data);
-          void handleRealtimeEvent(event);
+          void handleRealtimeEvent(preparedSessionId, event);
         } catch {
           // Ignore non-JSON transport messages.
         }
@@ -292,6 +350,14 @@ export default function KernorLiveClient({
       const offer = await peer.createOffer();
       await peer.setLocalDescription(offer);
 
+      setStatusText("Gathering connection candidates…");
+      await waitForIceGatheringComplete(peer);
+
+      // OpenAI's Realtime endpoint does not support trickled ICE, so the
+      // offer must carry every candidate gathered above — read the final
+      // local description rather than the pre-gathering `offer` object.
+      const finalSdp = peer.localDescription?.sdp || offer.sdp;
+
       setStatusText("Connecting secure transcription…");
 
       const webrtcResponse = await fetch(
@@ -301,7 +367,7 @@ export default function KernorLiveClient({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             sessionId: preparedSessionId,
-            sdp: offer.sdp,
+            sdp: finalSdp,
           }),
         }
       );
@@ -320,6 +386,19 @@ export default function KernorLiveClient({
         type: "answer",
         sdp: realtimePayload.sdp,
       });
+
+      setStatusText("Establishing realtime connection…");
+
+      // A successful SDP exchange does not guarantee the connection
+      // actually works (ICE/DTLS can still fail on a restrictive
+      // network) — do not activate, and do not consume the interview
+      // pass, until the peer connection genuinely reaches "connected".
+      const connected = await waitForPeerConnected(peer);
+      if (!connected) {
+        throw new Error(
+          "Kernor could not establish a stable realtime connection. Please try again."
+        );
+      }
 
       const activateResponse = await fetch(
         `/api/interviews/${interviewId}/live/activate`,
@@ -345,6 +424,7 @@ export default function KernorLiveClient({
       router.refresh();
     } catch (err) {
       stream?.getTracks().forEach((track) => track.stop());
+      dataChannel?.close();
       peer?.close();
       streamRef.current = null;
       peerRef.current = null;
@@ -367,6 +447,7 @@ export default function KernorLiveClient({
       manualRequestIdRef.current += 1;
       const itemId = `manual-${mode}-${manualRequestIdRef.current}`;
       const data = await saveTranscriptAndGuide(
+        sessionId,
         itemId,
         lastQuestion,
         mode,
@@ -389,12 +470,17 @@ export default function KernorLiveClient({
     setState("ending");
     setStatusText("Ending Live session…");
 
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    peerRef.current?.close();
-    channelRef.current?.close();
-    streamRef.current = null;
-    peerRef.current = null;
-    channelRef.current = null;
+    // Stop sending new audio immediately, but keep the data channel and
+    // peer connection open during the drain window so a transcription
+    // event already in flight for what was just said can still arrive and
+    // get persisted — closing the channel here would silently discard it.
+    streamRef.current?.getTracks().forEach((track) => {
+      track.enabled = false;
+    });
+
+    await wait(END_DRAIN_MS);
+
+    cleanupConnection();
 
     try {
       const response = await fetch(
@@ -488,7 +574,7 @@ export default function KernorLiveClient({
               onClick={startLive}
               disabled={!consent || interviewPasses < 1}
             >
-              Start Kernor Live
+              {state === "error" ? "Try again" : "Start Kernor Live"}
             </button>
           ) : null}
 
