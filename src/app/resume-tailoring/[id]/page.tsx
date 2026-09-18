@@ -160,6 +160,21 @@ export default async function ResumeTailoringPage({
           </div>
         </div>
 
+        {tailoring.status === "approved" ? (
+          <div className="card apply-ready-card">
+            <div>
+              <div className="muted" style={{ fontSize: 13 }}>Next step</div>
+              <h2 style={{ fontSize: 24, margin: "7px 0 5px" }}>Ready to apply.</h2>
+              <p className="muted" style={{ margin: 0 }}>
+                Kernor will use this exact approved PDF and pause whenever your input is required.
+              </p>
+            </div>
+            <Link className="btn btn-primary" href={`/apply/start?job=${tailoring.job_id}`}>
+              Apply with Kernor
+            </Link>
+          </div>
+        ) : null}
+
         <div className="approval-footer card">
           <div>
             <div className="muted" style={{ fontSize: 13 }}>Approval</div>
