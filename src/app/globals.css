@@ -221,3 +221,141 @@ button, input, textarea { font: inherit; }
     gap: 14px;
   }
 }
+
+
+.resume-review-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  align-items: flex-end;
+  margin-top: 24px;
+}
+.review-note {
+  margin-top: 24px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #f3f3ef;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 14px;
+}
+.resume-preview {
+  margin-top: 18px;
+  padding: 34px;
+}
+.resume-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--line);
+}
+.resume-section {
+  padding-top: 26px;
+}
+.resume-section h3 {
+  margin: 0 0 14px;
+  font-size: 14px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.resume-bullets {
+  margin: 14px 0 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+  line-height: 1.6;
+}
+.skill-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.skill-chip {
+  border: 1px solid var(--line);
+  background: #fafaf8;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+.diff-card {
+  padding: 24px;
+}
+.diff-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+.diff-type {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: #f3f3ef;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: capitalize;
+}
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+.diff-pane {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  background: #fafaf8;
+  min-height: 120px;
+}
+.diff-pane.revised {
+  background: #f1f8f4;
+}
+.diff-label {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.diff-pane p {
+  margin: 0;
+  line-height: 1.6;
+}
+.diff-reason {
+  margin-top: 16px;
+  line-height: 1.55;
+}
+.diff-reason p {
+  margin: 6px 0 0;
+}
+.evidence-box {
+  margin-top: 12px;
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  background: var(--accent-soft);
+  border-radius: 0 10px 10px 0;
+}
+.approval-footer {
+  margin-top: 22px;
+  padding: 26px;
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  align-items: center;
+}
+
+@media (max-width: 760px) {
+  .resume-review-heading,
+  .resume-preview-header,
+  .approval-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .diff-grid {
+    grid-template-columns: 1fr;
+  }
+  .resume-preview {
+    padding: 24px;
+  }
+}
