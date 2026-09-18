@@ -78,3 +78,38 @@ Kernor Match:
 3. Generate an explainable match score.
 4. Surface only strong matches.
 5. Pass the selected job into resume tailoring.
+
+
+## Kernor Match v0.2
+
+Kernor Match adds the first real AI workflow.
+
+### Flow
+
+1. Candidate completes onboarding and uploads a master resume.
+2. The first match request parses the resume into verified structured facts.
+3. The parsed profile is cached in Supabase for reuse.
+4. The user pastes a complete job description.
+5. Kernor compares the job only against verified candidate facts and preferences.
+6. The final score is calculated deterministically from weighted dimensions.
+7. Explicit critical missing requirements cap an otherwise high semantic score.
+8. The match and explanation are saved to `job_opportunities`.
+
+### Match weighting
+
+- Required qualifications: 25%
+- Professional experience: 20%
+- Skills & tools: 20%
+- Role & seniority: 10%
+- Industry/domain: 10%
+- Education & certifications: 5%
+- Location/work arrangement: 5%
+- Candidate preferences: 5%
+
+The default candidate threshold remains **85%+**.
+
+### AI privacy
+
+Resume parsing and match assessment are performed server-side. The OpenAI API key is never exposed to the browser, and model requests are configured with storage disabled.
+
+PDF resumes are passed as file input. DOCX resumes are converted to raw text server-side before structured extraction.

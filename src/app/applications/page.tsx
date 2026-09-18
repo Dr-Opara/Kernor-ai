@@ -23,7 +23,7 @@ export default async function ApplicationsPage() {
           <h1 style={{ fontSize: 46, letterSpacing: "-0.05em", margin: 0 }}>Applications</h1>
           <p className="muted">Everything you have in motion.</p>
         </div>
-        <button className="btn btn-primary">Find jobs</button>
+        <Link className="btn btn-primary" href="/match">Check a job</Link>
       </div>
 
       <div className="card" style={{ marginTop: 28, overflow: "hidden" }}>
@@ -44,7 +44,7 @@ export default async function ApplicationsPage() {
             <p className="muted" style={{ maxWidth: 540, lineHeight: 1.6 }}>
               Once you approve and submit a job, Kernor will track it here from application through interview and offer.
             </p>
-            <button className="btn btn-primary" style={{ marginTop: 14 }}>Find jobs</button>
+            <Link className="btn btn-primary" href="/match" style={{ marginTop: 14 }}>Check a job</Link>
           </div>
         )}
       </div>
