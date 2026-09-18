@@ -4,6 +4,7 @@ import {
   type TrackedApplication,
 } from "./google-detection";
 import { extractEmailSignal } from "./google-extract";
+import { upsertInterview } from "./google-sync";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getProviderToken } from "./oauth";
 
@@ -118,6 +119,26 @@ export async function syncMicrosoftEmail(
           signal_id: signal.id,
           provider: "microsoft",
         },
+      });
+    }
+
+    if (
+      extracted.signalType === "interview_invite" ||
+      extracted.signalType === "interview_update"
+    ) {
+      await upsertInterview({
+        userId,
+        applicationId: application.id,
+        source: "email",
+        externalId: `microsoft:${externalId}`,
+        signalId: signal.id,
+        stage: extracted.stage,
+        scheduledAt: extracted.scheduledAt,
+        timezone: extracted.timezone,
+        meetingProvider: extracted.meetingProvider,
+        meetingUrl: extracted.meetingUrl,
+        interviewerName: extracted.interviewerName,
+        interviewerEmail: extracted.interviewerEmail,
       });
     }
 
