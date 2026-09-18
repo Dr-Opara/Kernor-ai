@@ -8,17 +8,51 @@ Kernor is a calm AI-assisted career workspace that helps a candidate move throug
 
 ## v0.1
 
-This branch establishes the product foundation:
+The foundation now includes:
 
 - Marketing landing page
-- Sign-in shell
+- Supabase email/password authentication
+- Protected logged-in routes
 - Resume-first onboarding
-- Calm dashboard
+- Private PDF/DOCX resume storage
+- Candidate profile + job preference persistence
+- Calm live-data dashboard
 - Applications view
 - Interview workspace
-- Candidate profile shell
+- Candidate profile editing
+- Credit balance read model
 
-The current screens intentionally use static demo data. Authentication, Supabase persistence, payments, job discovery, resume parsing, browser automation, email/calendar integrations, and live interview assistance will be connected in later milestones.
+## Supabase
+
+The project uses Supabase for authentication, Postgres, RLS, and private resume storage.
+
+Public user-data tables:
+
+- `profiles`
+- `job_preferences`
+- `resumes`
+- `job_opportunities`
+- `applications`
+- `interviews`
+- `credit_balances`
+
+Private server-only billing tables live in `kernor_private`.
+
+Every exposed user-data table has Row Level Security enabled. Candidate records are scoped to the authenticated user. Credit balances are intentionally read-only from the user-facing client so paid credits cannot be self-issued.
+
+Resume files live in a private `resumes` bucket and are restricted to the owning user.
+
+## Environment
+
+Copy `.env.example` to `.env.local` and configure:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+Do not add Supabase secret/service-role keys to browser environment variables.
 
 ## Product principles
 
@@ -34,3 +68,13 @@ The current screens intentionally use static demo data. Authentication, Supabase
 - $1 per successfully submitted application
 - $19.99 per live interview
 - No required subscription
+
+## Next milestone
+
+Kernor Match:
+
+1. Ingest the verified candidate profile and master resume.
+2. Accept/discover job descriptions.
+3. Generate an explainable match score.
+4. Surface only strong matches.
+5. Pass the selected job into resume tailoring.
