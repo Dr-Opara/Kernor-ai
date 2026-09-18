@@ -10,7 +10,7 @@ export default async function InterviewsPage() {
 
   const { data: interviews } = await supabase
     .from("interviews")
-    .select("id,stage,scheduled_at,status,meeting_provider,live_pass_status,application_id,applications(company_name,role_title)")
+    .select("id,stage,scheduled_at,status,meeting_provider,live_pass_status,application_id,source,applications(company_name,role_title)")
     .eq("user_id", userId)
     .order("scheduled_at", { ascending: true });
 
@@ -30,6 +30,7 @@ export default async function InterviewsPage() {
             </h1>
             <p className="muted" style={{ fontSize: 18 }}>
               {upcoming.applications?.company_name || "Company"} · {upcoming.scheduled_at ? new Date(upcoming.scheduled_at).toLocaleString() : "Time pending"}
+              {upcoming.source ? ` · detected from ${upcoming.source}` : ""}
             </p>
 
             <div className="card" style={{ padding: 28, marginTop: 30 }}>
