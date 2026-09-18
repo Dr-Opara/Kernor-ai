@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { tailoredResumeSchema } from "@/lib/ai/schemas";
+import { renderTailoredResumePdf } from "@/lib/apply/resume-pdf";
 
 function slug(value: string) {
   return value
@@ -44,54 +45,77 @@ export async function POST(
 
   const company = tailoring.job_opportunities?.company_name || "Company";
   const role = tailoring.job_opportunities?.role_title || "Role";
-  const fileName = `${slug(company)}_${slug(role)}_Kernor_v${tailoring.version_number}.docx`;
+  const fileName = `${slug(company)}_${slug(role)}_Kernor_v${tailoring.version_number}.pdf`;
+  const storagePath = `${userId}/approved/${Date.now()}-${fileName}`;
 
-  const { data: approvedResume, error: resumeError } = await supabase
-    .from("resumes")
-    .insert({
-      user_id: userId,
-      file_name: fileName,
-      storage_path: null,
-      mime_type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      is_master: false,
-      is_approved: true,
-      parsed_data: {
-        type: "tailored",
-        tailoring_id: tailoring.id,
-        job_id: tailoring.job_id,
-        content: parsed.data,
-      },
-    })
-    .select("id")
-    .single();
+  try {
+    const pdfBytes = await renderTailoredResumePdf(parsed.data);
 
-  if (resumeError || !approvedResume) {
-    return NextResponse.json({ error: "Kernor could not approve this resume." }, { status: 500 });
-  }
+    const { error: uploadError } = await supabase.storage
+      .from("resumes")
+      .upload(storagePath, pdfBytes, {
+        contentType: "application/pdf",
+        upsert: false,
+      });
 
-  const now = new Date().toISOString();
+    if (uploadError) {
+      throw new Error(uploadError.message);
+    }
 
-  const [{ error: tailoringError }, { error: jobError }] = await Promise.all([
-    supabase
-      .from("resume_tailorings")
-      .update({
-        status: "approved",
-        approved_resume_id: approvedResume.id,
-        approved_at: now,
-        updated_at: now,
+    const { data: approvedResume, error: resumeError } = await supabase
+      .from("resumes")
+      .insert({
+        user_id: userId,
+        file_name: fileName,
+        storage_path: storagePath,
+        mime_type: "application/pdf",
+        size_bytes: pdfBytes.byteLength,
+        is_master: false,
+        is_approved: true,
+        parsed_data: {
+          type: "tailored",
+          tailoring_id: tailoring.id,
+          job_id: tailoring.job_id,
+          content: parsed.data,
+        },
       })
-      .eq("id", id)
-      .eq("user_id", userId),
-    supabase
-      .from("job_opportunities")
-      .update({ status: "approved", updated_at: now })
-      .eq("id", tailoring.job_id)
-      .eq("user_id", userId),
-  ]);
+      .select("id")
+      .single();
 
-  if (tailoringError || jobError) {
-    return NextResponse.json({ error: "Approval could not be finalized." }, { status: 500 });
+    if (resumeError || !approvedResume) {
+      await supabase.storage.from("resumes").remove([storagePath]);
+      throw new Error("Kernor could not save the approved resume.");
+    }
+
+    const now = new Date().toISOString();
+
+    const [{ error: tailoringError }, { error: jobError }] = await Promise.all([
+      supabase
+        .from("resume_tailorings")
+        .update({
+          status: "approved",
+          approved_resume_id: approvedResume.id,
+          approved_at: now,
+          updated_at: now,
+        })
+        .eq("id", id)
+        .eq("user_id", userId),
+      supabase
+        .from("job_opportunities")
+        .update({ status: "approved", updated_at: now })
+        .eq("id", tailoring.job_id)
+        .eq("user_id", userId),
+    ]);
+
+    if (tailoringError || jobError) {
+      throw new Error("Approval could not be finalized.");
+    }
+
+    return NextResponse.json({ resumeId: approvedResume.id });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Kernor could not approve this resume." },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ resumeId: approvedResume.id });
 }

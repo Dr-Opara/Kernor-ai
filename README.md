@@ -160,3 +160,47 @@ Application credits are not consumed at purchase time. The future Apply workflow
 Stripe Checkout creates one-time payment sessions. A signed Stripe webhook records an idempotent billing event, which atomically creates a credit transaction and updates the user's balance.
 
 The browser can read its own balances/history but cannot create or modify credits.
+
+
+## Kernor Apply v0.5
+
+Kernor Apply is an assisted, human-in-the-loop application browser.
+
+### Flow
+
+1. Candidate approves a tailored resume.
+2. Kernor generates a private PDF artifact for that exact approved version.
+3. Candidate opens **Apply with Kernor** and provides the employer application URL.
+4. Kernor starts a durable browser session.
+5. Known fields are filled only from verified profile facts or reusable Q&A answers.
+6. Kernor pauses for:
+   - login
+   - MFA / verification codes
+   - CAPTCHA / human verification
+   - identity confirmation
+   - sensitive demographic questions
+   - unknown or unverified application questions
+7. Candidate can open the live browser and take over when needed.
+8. Kernor pauses again before final submission.
+9. Candidate explicitly presses **Submit application**.
+10. One application credit is consumed only after a success confirmation is detected.
+
+### Browser runtime
+
+The current provider adapter uses Browserbase with Playwright and keeps the integration isolated under `src/lib/apply` so a different hosted browser provider can be substituted later.
+
+Kernor does not enable CAPTCHA solving or bypass MFA/identity controls.
+
+### Durable execution
+
+Apply runs use Vercel Workflow so browser work can pause and resume instead of relying on one long request.
+
+### Data
+
+Phase 5 adds:
+- `application_answer_vault`
+- `application_runs`
+- `application_run_events`
+- `application_run_questions`
+
+User-facing run/event data is protected by RLS. System-created run records remain server controlled.

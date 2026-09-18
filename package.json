@@ -18,7 +18,11 @@
     "@ai-sdk/openai": "4.0.69",
     "zod": "4.6.5",
     "mammoth": "1.12.3",
-    "stripe": "22.6.2"
+    "stripe": "22.6.2",
+    "@browserbasehq/sdk": "2.20.0",
+    "playwright-core": "1.63.0",
+    "pdf-lib": "1.17.1",
+    "workflow": "5.0.0-beta.53"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.0.0",
