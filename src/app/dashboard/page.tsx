@@ -38,7 +38,7 @@ export default async function DashboardPage() {
             <Link href="/profile">Profile</Link>
           </nav>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <span className="muted" style={{ fontSize: 14 }}>{credits?.application_credits ?? 0} credits</span>
+            <Link href="/billing" className="muted credit-link" style={{ fontSize: 14 }}>{credits?.application_credits ?? 0} credits</Link>
             <div className="avatar">{firstName(profile?.full_name).slice(0, 1).toUpperCase()}</div>
           </div>
         </div>

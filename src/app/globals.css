@@ -359,3 +359,82 @@ button, input, textarea { font: inherit; }
     padding: 24px;
   }
 }
+
+
+.billing-success {
+  margin-top: 22px;
+  padding: 15px 17px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 650;
+}
+.billing-balance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 28px;
+}
+.billing-balance-card {
+  padding: 26px;
+  display: grid;
+  gap: 8px;
+}
+.billing-balance-card strong {
+  font-size: 42px;
+  letter-spacing: -0.05em;
+}
+.billing-pack-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.billing-pack {
+  padding: 22px;
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+.billing-pack-number {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  margin: 7px 0 2px;
+}
+.interview-pass-card {
+  margin-top: 18px;
+  padding: 26px;
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  align-items: center;
+}
+.billing-history-row {
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+}
+.credit-link:hover {
+  color: var(--text);
+}
+
+@media (max-width: 860px) {
+  .billing-pack-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .billing-balance-grid,
+  .billing-pack-grid {
+    grid-template-columns: 1fr;
+  }
+  .interview-pass-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
