@@ -4,19 +4,7 @@ import { liveGuidanceSchema } from "./schemas";
 
 const MODEL = process.env.KERNOR_LIVE_GUIDANCE_MODEL || process.env.KERNOR_MATCH_MODEL || "gpt-5.6-luna";
 
-export async function generateLiveGuidance(input: {
-  transcript: string;
-  mode: "default" | "star" | "shorter" | "technical" | "follow_up" | "manual";
-  context: unknown;
-}) {
-  const result = await generateText({
-    model: openai(MODEL),
-    output: Output.object({
-      name: "KernorLiveGuidance",
-      description: "Grounded, concise interview answer guidance.",
-      schema: liveGuidanceSchema,
-    }),
-    system: `
+export const LIVE_GUIDANCE_SYSTEM_PROMPT = `
 You are a real-time interview support assistant for the candidate.
 
 The candidate remains the speaker. You provide concise on-screen guidance only.
@@ -34,7 +22,21 @@ Rules:
 - mode=technical: emphasize technical detail that is actually supported.
 - mode=follow_up: answer as a follow-up to the same question.
 - Return verifiedEvidence as short reminders of the exact facts used.
-`,
+`;
+
+export async function generateLiveGuidance(input: {
+  transcript: string;
+  mode: "default" | "star" | "shorter" | "technical" | "follow_up" | "manual";
+  context: unknown;
+}) {
+  const result = await generateText({
+    model: openai(MODEL),
+    output: Output.object({
+      name: "KernorLiveGuidance",
+      description: "Grounded, concise interview answer guidance.",
+      schema: liveGuidanceSchema,
+    }),
+    system: LIVE_GUIDANCE_SYSTEM_PROMPT,
     prompt: `
 LIVE TRANSCRIPT:
 ${input.transcript}

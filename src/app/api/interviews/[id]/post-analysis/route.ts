@@ -3,11 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { generatePostInterviewAnalysis } from "@/lib/ai/post-interview";
 import { generateRoundHandoff } from "@/lib/ai/round-handoff";
+import { mergeRoundMemory } from "@/lib/interviews/round-memory-merge";
 import type { InterviewerDetails } from "@/types/json-fields";
-
-function unique(values: string[]) {
-  return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
-}
 
 export async function POST(
   _request: Request,
@@ -161,54 +158,38 @@ export async function POST(
       throw new Error("Kernor could not save the follow-up draft.");
     }
 
-    const roundNumber =
-      interview.round_number ||
-      existingMemory?.round_number ||
-      ((priorRounds?.length ?? 0) + 1);
-
-    const mergedQuestions = unique([
-      ...(existingMemory?.questions_asked || []),
-      ...analysis.questionsAsked,
-    ]);
-    const mergedTopics = unique([
-      ...(existingMemory?.topics_discussed || []),
-      ...analysis.topicsDiscussed,
-    ]);
-    const mergedExperiences = unique([
-      ...(existingMemory?.experiences_used || []),
-      ...analysis.experiencesReferenced,
-    ]);
-    const mergedCommitments = unique([
-      ...(existingMemory?.commitments || []),
-      ...analysis.commitments,
-    ]);
-    const existingSignals = existingMemory?.interviewer_signals || [];
+    const merged = mergeRoundMemory({
+      existingMemory,
+      analysis: {
+        questionsAsked: analysis.questionsAsked,
+        topicsDiscussed: analysis.topicsDiscussed,
+        experiencesReferenced: analysis.experiencesReferenced,
+        commitments: analysis.commitments,
+      },
+      interviewRoundNumber: interview.round_number,
+      priorRoundsCount: priorRounds?.length ?? 0,
+    });
 
     const handoff = await generateRoundHandoff({
       companyName: interview.applications.company_name,
       roleTitle: interview.applications.role_title,
       jobSnapshot: interview.applications.job_snapshot,
-      questionsAsked: mergedQuestions,
-      topicsDiscussed: mergedTopics,
-      experiencesUsed: mergedExperiences,
-      interviewerSignals: existingSignals,
-      commitments: mergedCommitments,
-      candidateNotes: existingMemory?.candidate_notes || null,
+      questionsAsked: merged.questions_asked,
+      topicsDiscussed: merged.topics_discussed,
+      experiencesUsed: merged.experiences_used,
+      interviewerSignals: merged.interviewer_signals,
+      commitments: merged.commitments,
+      candidateNotes: merged.candidate_notes,
     });
+
+    const roundNumber = merged.round_number;
 
     const memoryValues = {
       interview_id: id,
       application_id: interview.application_id,
       user_id: userId,
-      round_number: roundNumber,
-      questions_asked: mergedQuestions,
-      topics_discussed: mergedTopics,
-      experiences_used: mergedExperiences,
-      interviewer_signals: existingSignals,
-      commitments: mergedCommitments,
-      candidate_notes: existingMemory?.candidate_notes || null,
+      ...merged,
       handoff_summary: handoff,
-      source: existingMemory?.source === "user" ? "user" : "live",
       updated_at: new Date().toISOString(),
     };
 

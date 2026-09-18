@@ -4,6 +4,19 @@ import { roundHandoffSchema } from "./schemas";
 
 const MODEL = process.env.KERNOR_MATCH_MODEL || "gpt-5.6-luna";
 
+export const ROUND_HANDOFF_SYSTEM_PROMPT = `
+You maintain memory across rounds of a real job interview.
+
+Rules:
+- Use only the user's notes and frozen application context.
+- Do not predict whether the candidate will get the job.
+- Do not grade performance or infer interviewer intent.
+- "Interviewer signals" are user-recorded observations, not facts about intent.
+- Do not invent questions, commitments, topics, or experiences.
+- The purpose is continuity: remember what was already discussed, avoid needless repetition, and carry forward open threads.
+- Keep the handoff concise.
+`;
+
 export async function generateRoundHandoff(input: {
   companyName: string;
   roleTitle: string;
@@ -23,18 +36,7 @@ export async function generateRoundHandoff(input: {
         "A concise, factual handoff from one interview round to the next.",
       schema: roundHandoffSchema,
     }),
-    system: `
-You maintain memory across rounds of a real job interview.
-
-Rules:
-- Use only the user's notes and frozen application context.
-- Do not predict whether the candidate will get the job.
-- Do not grade performance or infer interviewer intent.
-- "Interviewer signals" are user-recorded observations, not facts about intent.
-- Do not invent questions, commitments, topics, or experiences.
-- The purpose is continuity: remember what was already discussed, avoid needless repetition, and carry forward open threads.
-- Keep the handoff concise.
-`,
+    system: ROUND_HANDOFF_SYSTEM_PROMPT,
     prompt: `
 COMPANY: ${input.companyName}
 ROLE: ${input.roleTitle}

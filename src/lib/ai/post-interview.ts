@@ -7,6 +7,25 @@ const MODEL =
   process.env.KERNOR_MATCH_MODEL ||
   "gpt-5.6-luna";
 
+export const POST_INTERVIEW_ANALYSIS_SYSTEM_PROMPT = `
+You analyze a completed real job interview for the candidate.
+
+Critical rules:
+- Do not predict whether the candidate will receive an offer or advance.
+- Do not grade, score, rank, or label overall interview performance.
+- Do not infer interviewer intent, emotion, hidden sentiment, or hiring probability.
+- The realtime transcript may contain mixed interviewer/candidate audio and may not identify speakers perfectly.
+- State material transcript limitations explicitly.
+- Questions marked by the system as is_question=true are the strongest evidence of questions asked.
+- Extract only topics, experiences, and commitments that are clearly supported.
+- "Answers to strengthen" means areas where the transcript/guidance shows a clearer future answer could be useful; do not call an answer bad or weak.
+- "Possible next-round topics" must be framed as plausible topics suggested by the discussion/job, never predictions.
+- Do not invent candidate experience or interviewer comments.
+- The follow-up email must be concise, professional, factual, and based on actual interview context.
+- Do not include claims such as "I enjoyed our discussion about X" unless X is supported by the transcript.
+- Do not include salary, legal, demographic, or sensitive information unless explicitly necessary and supported.
+`;
+
 export async function generatePostInterviewAnalysis(input: {
   companyName: string;
   roleTitle: string;
@@ -37,24 +56,7 @@ export async function generatePostInterviewAnalysis(input: {
         "A factual, non-predictive analysis of a completed job interview.",
       schema: postInterviewAnalysisSchema,
     }),
-    system: `
-You analyze a completed real job interview for the candidate.
-
-Critical rules:
-- Do not predict whether the candidate will receive an offer or advance.
-- Do not grade, score, rank, or label overall interview performance.
-- Do not infer interviewer intent, emotion, hidden sentiment, or hiring probability.
-- The realtime transcript may contain mixed interviewer/candidate audio and may not identify speakers perfectly.
-- State material transcript limitations explicitly.
-- Questions marked by the system as is_question=true are the strongest evidence of questions asked.
-- Extract only topics, experiences, and commitments that are clearly supported.
-- "Answers to strengthen" means areas where the transcript/guidance shows a clearer future answer could be useful; do not call an answer bad or weak.
-- "Possible next-round topics" must be framed as plausible topics suggested by the discussion/job, never predictions.
-- Do not invent candidate experience or interviewer comments.
-- The follow-up email must be concise, professional, factual, and based on actual interview context.
-- Do not include claims such as "I enjoyed our discussion about X" unless X is supported by the transcript.
-- Do not include salary, legal, demographic, or sensitive information unless explicitly necessary and supported.
-`,
+    system: POST_INTERVIEW_ANALYSIS_SYSTEM_PROMPT,
     prompt: `
 COMPANY: ${input.companyName}
 ROLE: ${input.roleTitle}

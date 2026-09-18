@@ -6,6 +6,7 @@ import {
 } from "@/lib/apply/browserbase";
 import { createServiceClient } from "@/lib/supabase/service";
 import { decideField, type ApplyContext } from "@/lib/apply/field-rules";
+import { applicationCreditReference } from "@/lib/billing/credit-references";
 import type { Json } from "@/types/database";
 
 type ApplyCommand = "continue" | "submit" | "cancel";
@@ -352,7 +353,7 @@ async function finalizeConfirmedExistingSubmission(input: {
     credit_type: "application",
     delta: -1,
     reason: "successful_application",
-    external_reference: `application:${input.run.id}`,
+    external_reference: applicationCreditReference(input.run.id),
     metadata: {
       application_run_id: input.run.id,
       job_id: input.run.job_id,
@@ -783,7 +784,7 @@ export async function runApplicationPass(runId: string, command: ApplyCommand) {
       });
     }
 
-    const creditReference = `application:${runId}`;
+    const creditReference = applicationCreditReference(runId);
     const { error: creditError } = await supabase.from("credit_transactions").insert({
       user_id: run.user_id,
       credit_type: "application",
