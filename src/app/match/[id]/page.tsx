@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { matchAssessmentSchema } from "@/lib/ai/schemas";
+import TailorButton from "@/components/tailor-button";
 
 const dimensionLabels: Record<string, string> = {
   requiredQualifications: "Required qualifications",
@@ -165,10 +166,10 @@ export default async function MatchResultPage({
               {score >= 85 ? "This role cleared your match target." : "You decide whether this role is worth pursuing."}
             </h2>
             <p className="muted" style={{ margin: 0 }}>
-              Resume tailoring is the next Kernor milestone. This match is saved to your dashboard now.
+              Kernor can tailor your resume to this role using only the experience and qualifications already verified in your profile.
             </p>
           </div>
-          <Link href="/dashboard" className="btn btn-primary">Back to dashboard</Link>
+          <TailorButton jobId={job.id} />
         </div>
       </div>
     </main>

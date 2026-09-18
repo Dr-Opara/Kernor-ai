@@ -89,3 +89,39 @@ export const matchAssessmentSchema = z.object({
 
 export type ResumeProfile = z.infer<typeof resumeProfileSchema>;
 export type MatchAssessment = z.infer<typeof matchAssessmentSchema>;
+
+
+export const tailoredResumeSchema = z.object({
+  headline: z.string().nullable(),
+  professionalSummary: z.string(),
+  skills: z.array(z.string()),
+  roles: z.array(z.object({
+    title: z.string(),
+    company: z.string().nullable(),
+    start: z.string().nullable(),
+    end: z.string().nullable(),
+    bullets: z.array(z.string()),
+  })),
+  education: z.array(z.object({
+    degree: z.string(),
+    field: z.string().nullable(),
+    institution: z.string().nullable(),
+  })),
+  certifications: z.array(z.string()),
+});
+
+export const resumeTailoringOutputSchema = z.object({
+  tailoredResume: tailoredResumeSchema,
+  changes: z.array(z.object({
+    type: z.enum(["rewrite", "reorder", "emphasize", "clarify", "remove_irrelevant"]),
+    section: z.string(),
+    original: z.string().nullable(),
+    revised: z.string().nullable(),
+    reason: z.string(),
+    verifiedEvidence: z.array(z.string()).min(1),
+  })),
+  notes: z.array(z.string()),
+});
+
+export type TailoredResume = z.infer<typeof tailoredResumeSchema>;
+export type ResumeTailoringOutput = z.infer<typeof resumeTailoringOutputSchema>;
