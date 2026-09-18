@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { generatePostInterviewAnalysis } from "@/lib/ai/post-interview";
 import { generateRoundHandoff } from "@/lib/ai/round-handoff";
+import type { InterviewerDetails } from "@/types/json-fields";
 
 function unique(values: string[]) {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
@@ -129,13 +130,15 @@ export async function POST(
       throw new Error("Kernor could not save the analysis.");
     }
 
+    const interviewerDetails =
+      interview.interviewer_details as InterviewerDetails | null;
     const interviewerEmail =
-      typeof interview.interviewer_details?.email === "string"
-        ? interview.interviewer_details.email
+      typeof interviewerDetails?.email === "string"
+        ? interviewerDetails.email
         : null;
     const interviewerName =
-      typeof interview.interviewer_details?.name === "string"
-        ? interview.interviewer_details.name
+      typeof interviewerDetails?.name === "string"
+        ? interviewerDetails.name
         : null;
 
     const { data: followUp, error: followUpError } = await service

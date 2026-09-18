@@ -4,7 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import InterviewSettingsForm from "@/components/interview-settings-form";
 import ReadinessButton from "@/components/readiness-button";
 import RoundMemoryForm from "@/components/round-memory-form";
-import { interviewReadinessSchema } from "@/lib/ai/schemas";
+import { interviewReadinessSchema, type RoundHandoff } from "@/lib/ai/schemas";
+import type {
+  InterviewerDetails,
+  JobSnapshot,
+  ResumeSnapshot,
+} from "@/types/json-fields";
 
 export default async function InterviewWorkspacePage({
   params,
@@ -87,9 +92,11 @@ export default async function InterviewWorkspacePage({
   const briefing =
     parsedReadiness?.success ? parsedReadiness.data : null;
 
-  const resumePath =
-    application.resume_snapshot?.storage_path ||
-    null;
+  const resumeSnapshot = application.resume_snapshot as ResumeSnapshot;
+  const jobSnapshot = application.job_snapshot as JobSnapshot;
+  const interviewerDetails = interview.interviewer_details as InterviewerDetails;
+
+  const resumePath = resumeSnapshot?.storage_path || null;
 
   let resumeUrl: string | null = null;
 
@@ -102,12 +109,12 @@ export default async function InterviewWorkspacePage({
   }
 
   const jobDescription =
-    application.job_snapshot?.description ||
+    jobSnapshot?.description ||
     "The original job description was not captured.";
 
   const interviewer =
-    interview.interviewer_details?.name ||
-    interview.interviewer_details?.email ||
+    interviewerDetails?.name ||
+    interviewerDetails?.email ||
     "Not provided";
 
   return (
@@ -305,7 +312,11 @@ export default async function InterviewWorkspacePage({
               <div className="round-history-list">
                 {allRoundMemory
                   .filter((memory) => memory.interview_id !== id)
-                  .map((memory) => (
+                  .map((memory) => {
+                    const handoffSummary =
+                      memory.handoff_summary as RoundHandoff | null;
+
+                    return (
                     <div className="round-history-item" key={memory.id}>
                       <div className="round-history-heading">
                         <strong>Round {memory.round_number}</strong>
@@ -314,31 +325,32 @@ export default async function InterviewWorkspacePage({
                         </span>
                       </div>
 
-                      {memory.handoff_summary?.summary ? (
+                      {handoffSummary?.summary ? (
                         <p className="muted" style={{ lineHeight: 1.55 }}>
-                          {memory.handoff_summary.summary}
+                          {handoffSummary.summary}
                         </p>
                       ) : null}
 
-                      {memory.handoff_summary?.buildOn?.length ? (
+                      {handoffSummary?.buildOn?.length ? (
                         <div className="round-memory-mini">
                           <span className="muted">Build on</span>
-                          {memory.handoff_summary.buildOn.map((item: string) => (
+                          {handoffSummary.buildOn.map((item: string) => (
                             <div key={item}>• {item}</div>
                           ))}
                         </div>
                       ) : null}
 
-                      {memory.handoff_summary?.openThreads?.length ? (
+                      {handoffSummary?.openThreads?.length ? (
                         <div className="round-memory-mini">
                           <span className="muted">Open threads</span>
-                          {memory.handoff_summary.openThreads.map((item: string) => (
+                          {handoffSummary.openThreads.map((item: string) => (
                             <div key={item}>• {item}</div>
                           ))}
                         </div>
                       ) : null}
                     </div>
-                  ))}
+                    );
+                  })}
               </div>
             </div>
           ) : null}

@@ -2,33 +2,17 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-// See the note in src/app/applications/page.tsx: the Supabase client infers
-// array typing for this embedded to-one relationship until generated
-// database types are wired in. This reflects the actual runtime shape.
-type InterviewRow = {
-  id: string;
-  stage: string | null;
-  scheduled_at: string | null;
-  status: string;
-  meeting_provider: string | null;
-  source: string | null;
-  readiness_generated_at: string | null;
-  applications: { company_name: string | null; role_title: string | null } | null;
-};
-
 export default async function InterviewsPage() {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
   const userId = auth?.claims?.sub;
   if (!userId) redirect("/login");
 
-  const { data: interviewsData } = await supabase
+  const { data: interviews } = await supabase
     .from("interviews")
     .select("id,stage,scheduled_at,status,meeting_provider,source,readiness_generated_at,applications(company_name,role_title)")
     .eq("user_id", userId)
     .order("scheduled_at", { ascending: true });
-
-  const interviews = interviewsData as unknown as InterviewRow[] | null;
 
   const upcoming =
     interviews?.filter((item) =>

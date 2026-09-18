@@ -6,6 +6,7 @@ import {
 } from "@/lib/apply/browserbase";
 import { createServiceClient } from "@/lib/supabase/service";
 import { decideField, type ApplyContext } from "@/lib/apply/field-rules";
+import type { Json } from "@/types/database";
 
 type ApplyCommand = "continue" | "submit" | "cancel";
 
@@ -34,7 +35,7 @@ async function logEvent(
     user_id: userId,
     event_type: eventType,
     summary,
-    metadata,
+    metadata: metadata as Json,
   });
 }
 
