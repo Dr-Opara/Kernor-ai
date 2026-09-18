@@ -165,3 +165,36 @@ export const roundHandoffSchema = z.object({
 });
 
 export type RoundHandoff = z.infer<typeof roundHandoffSchema>;
+
+
+export const liveGuidanceSchema = z.object({
+  isQuestion: z.boolean(),
+  questionText: z.string().nullable(),
+  responseText: z.string().nullable(),
+  structure: z.string().nullable(),
+  verifiedEvidence: z.array(z.string()).max(8),
+  caution: z.string().nullable(),
+});
+
+export type LiveGuidance = z.infer<typeof liveGuidanceSchema>;
+
+export const postInterviewAnalysisSchema = z.object({
+  factualSummary: z.string(),
+  questionsAsked: z.array(z.string()).max(30),
+  topicsDiscussed: z.array(z.string()).max(30),
+  experiencesReferenced: z.array(z.string()).max(20),
+  commitments: z.array(z.string()).max(20),
+  answersToStrengthen: z.array(z.object({
+    topic: z.string(),
+    observation: z.string(),
+    strongerApproach: z.string(),
+  })).max(12),
+  possibleNextRoundTopics: z.array(z.object({
+    topic: z.string(),
+    rationale: z.string(),
+  })).max(10),
+  followUpDraft: z.object({
+    subject: z.string(),
+    body: z.string(),
+  }),
+});

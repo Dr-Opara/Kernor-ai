@@ -343,3 +343,40 @@ Later interview readiness automatically includes prior-round memory.
 Phase 9 does not grade interview performance or predict hiring outcomes.
 
 When Kernor Live is introduced in Phase 10, transcript-derived memory can populate this same model automatically. Full post-interview analysis and follow-up remain Phase 11.
+
+
+## Kernor Live v0.10
+
+Kernor Live provides private, on-screen interview guidance while the candidate remains the speaker.
+
+### Flow
+
+1. Candidate opens the existing Interview Workspace.
+2. Candidate explicitly starts Kernor Live and consents to audio transcription.
+3. Candidate selects:
+   - shared interview audio
+   - shared audio + microphone
+   - microphone only
+4. The browser creates an OpenAI Realtime WebRTC connection.
+5. Audio is transcribed with `gpt-live-transcribe`.
+6. Completed transcript turns are sent to Kernor's server.
+7. Kernor determines whether the turn is an interview question.
+8. If so, it generates grounded guidance using the frozen application, submitted resume, readiness brief, and prior rounds.
+9. The candidate can request STAR, shorter, more technical, or follow-up guidance.
+10. The candidate ends the session; transcript context remains attached to the interview.
+
+### Billing
+
+Opening the Live screen costs nothing.
+
+One interview pass is consumed only after the realtime connection succeeds and the Live session atomically activates.
+
+Reconnecting the same active session does not consume another pass.
+
+### Boundaries
+
+- Kernor does not join the meeting as a participant.
+- Kernor does not speak for the candidate.
+- Kernor requires explicit audio consent.
+- Shared video is immediately discarded; only the shared audio track is used.
+- Guidance may use only verified candidate context.
