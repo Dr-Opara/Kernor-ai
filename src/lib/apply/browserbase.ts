@@ -15,15 +15,10 @@ export async function createApplicationBrowserSession(input: {
   const projectId = process.env.BROWSERBASE_PROJECT_ID;
   if (!projectId) throw new Error("Browserbase project ID is not configured.");
 
-  const target = new URL(input.targetUrl);
-
   const session = await client.sessions.create({
     projectId,
     keepAlive: true,
     api_timeout: 3600,
-    browserSettings: {
-      allowedDomains: [target.hostname],
-    },
     userMetadata: {
       kernor_run_id: input.runId,
       kernor_user_id: input.userId,
