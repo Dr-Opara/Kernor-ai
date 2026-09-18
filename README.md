@@ -204,3 +204,30 @@ Phase 5 adds:
 - `application_run_questions`
 
 User-facing run/event data is protected by RLS. System-created run records remain server controlled.
+
+
+## Kernor Track v0.6
+
+Kernor Track turns submitted applications into a persistent lifecycle.
+
+### Lifecycle
+
+Applied -> Employer response -> Assessment -> Interview -> Rejected / Withdrawn / Offer -> Accepted
+
+### What is preserved
+
+Each application freezes:
+- the match score at application time
+- the exact job context
+- the exact approved resume used
+
+The application timeline stores system, user, Gmail, and Calendar events in one history.
+
+### User experience
+
+- Search by company or role
+- Filter by current status
+- Open a single application record
+- Review every status event
+- Add a manual status update and note
+- Open linked interview context when available
