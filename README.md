@@ -134,3 +134,29 @@ Kernor never adds unsupported qualifications to improve a match.
 The repository includes `AGENTS.md` with persistent product, security, AI, billing, and UX rules for Codex.
 
 See `docs/development/codex.md` for the recommended VS Code + Codex workflow.
+
+
+## Kernor Billing v0.4
+
+Billing adds prepaid application credits and interview passes without a subscription.
+
+### Application credit packs
+
+- 10 credits — $10
+- 25 credits — $25
+- 50 credits — $45
+- 100 credits — $80
+
+Application credits are not consumed at purchase time. The future Apply workflow will consume one credit only after a successful application submission.
+
+### Interview pass
+
+- 1 Kernor Live interview pass — $19.99
+- Workspace setup remains free
+- The pass will be consumed only when the live interview assistant starts
+
+### Fulfillment
+
+Stripe Checkout creates one-time payment sessions. A signed Stripe webhook records an idempotent billing event, which atomically creates a credit transaction and updates the user's balance.
+
+The browser can read its own balances/history but cannot create or modify credits.
