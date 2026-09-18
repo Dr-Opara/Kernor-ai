@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
   kernor_private: {
     Tables: {
       billing_customers: {
@@ -1514,6 +1509,19 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      kernor_finalize_successful_application: {
+        Args: {
+          p_confirmation_text: string
+          p_page_url?: string
+          p_run_id: string
+          p_user_id: string
+        }
+        Returns: {
+          already_finalized: boolean
+          application_id: string
+          run_id: string
+        }[]
+      }
       kernor_get_integration_secret: {
         Args: { p_secret_id: string }
         Returns: string
@@ -1657,3 +1665,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

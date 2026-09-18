@@ -6,7 +6,6 @@ import {
 } from "@/lib/apply/browserbase";
 import { createServiceClient } from "@/lib/supabase/service";
 import { decideField, type ApplyContext } from "@/lib/apply/field-rules";
-import { applicationCreditReference } from "@/lib/billing/credit-references";
 import type { Json } from "@/types/database";
 
 type ApplyCommand = "continue" | "submit" | "cancel";
@@ -298,97 +297,29 @@ async function saveQuestions(
 }
 
 
-async function finalizeConfirmedExistingSubmission(input: {
+// Delegates all finalization writes (application upsert, exactly-one
+// credit debit, job/run status) to a single atomic RPC — see
+// supabase/migrations/*_apply_finalization_rpc.sql. Re-running this for
+// the same run (e.g. after a network failure that lost the response) is
+// safe: the RPC returns already_finalized=true and does not re-charge.
+export async function finalizeConfirmedExistingSubmission(input: {
   run: any;
   confirmation: string;
   pageUrl: string;
   browserSessionId: string;
 }) {
   const supabase = createServiceClient();
-  const now = new Date().toISOString();
 
-  const { data: existingApplication } = await supabase
-    .from("applications")
-    .select("id")
-    .eq("user_id", input.run.user_id)
-    .eq("job_id", input.run.job_id)
-    .maybeSingle();
-
-  if (existingApplication) {
-    await supabase
-      .from("applications")
-      .update({
-        tailored_resume_id: input.run.approved_resume_id,
-        application_url: input.run.target_url,
-        status: "applied",
-        submission_confirmation: input.confirmation,
-        submitted_at: now,
-        last_event_at: now,
-        updated_at: now,
-      })
-      .eq("id", existingApplication.id);
-  } else {
-    const { data: job } = await supabase
-      .from("job_opportunities")
-      .select("company_name,role_title")
-      .eq("id", input.run.job_id)
-      .single();
-
-    await supabase.from("applications").insert({
-      user_id: input.run.user_id,
-      job_id: input.run.job_id,
-      tailored_resume_id: input.run.approved_resume_id,
-      company_name: job?.company_name || "Company",
-      role_title: job?.role_title || "Role",
-      application_url: input.run.target_url,
-      status: "applied",
-      submission_confirmation: input.confirmation,
-      submitted_at: now,
-      last_event_at: now,
-    });
-  }
-
-  const { error: creditError } = await supabase.from("credit_transactions").insert({
-    user_id: input.run.user_id,
-    credit_type: "application",
-    delta: -1,
-    reason: "successful_application",
-    external_reference: applicationCreditReference(input.run.id),
-    metadata: {
-      application_run_id: input.run.id,
-      job_id: input.run.job_id,
-    },
+  const { error } = await supabase.rpc("kernor_finalize_successful_application", {
+    p_run_id: input.run.id,
+    p_user_id: input.run.user_id,
+    p_confirmation_text: input.confirmation,
+    p_page_url: input.pageUrl,
   });
 
-  if (creditError && creditError.code !== "23505") {
-    throw new Error("Application confirmed, but credit accounting failed.");
+  if (error) {
+    throw new Error("Application confirmed, but Kernor could not finalize it: " + error.message);
   }
-
-  await Promise.all([
-    supabase
-      .from("job_opportunities")
-      .update({ status: "applied", updated_at: now })
-      .eq("id", input.run.job_id),
-    supabase
-      .from("application_runs")
-      .update({
-        status: "submitted",
-        stop_reason: null,
-        submission_confirmation: input.confirmation,
-        submission_evidence: {
-          after_url: input.pageUrl,
-          confirmation_detected: true,
-          confirmation_text: input.confirmation,
-          detected_on_resume: true,
-        },
-        current_url: input.pageUrl,
-        submitted_at: now,
-        finished_at: now,
-        resume_token: null,
-        updated_at: now,
-      })
-      .eq("id", input.run.id),
-  ]);
 
   await logEvent(input.run.id, input.run.user_id, "submitted", "Application submission confirmed.", {
     url: input.pageUrl,
@@ -741,91 +672,21 @@ export async function runApplicationPass(runId: string, command: ApplyCommand) {
       return { terminal: false, status: "needs_user" as const, reason };
     }
 
-    const now = new Date().toISOString();
+    const { error: finalizeError } = await supabase.rpc(
+      "kernor_finalize_successful_application",
+      {
+        p_run_id: runId,
+        p_user_id: run.user_id,
+        p_confirmation_text: confirmationMatch[0],
+        p_page_url: afterUrl,
+      }
+    );
 
-    const { data: existingApplication } = await supabase
-      .from("applications")
-      .select("id")
-      .eq("user_id", run.user_id)
-      .eq("job_id", run.job_id)
-      .maybeSingle();
-
-    if (existingApplication) {
-      await supabase
-        .from("applications")
-        .update({
-          tailored_resume_id: run.approved_resume_id,
-          application_url: run.target_url,
-          status: "applied",
-          submission_confirmation: confirmationMatch[0],
-          submitted_at: now,
-          last_event_at: now,
-          updated_at: now,
-        })
-        .eq("id", existingApplication.id);
-    } else {
-      const { data: job } = await supabase
-        .from("job_opportunities")
-        .select("company_name,role_title")
-        .eq("id", run.job_id)
-        .single();
-
-      await supabase.from("applications").insert({
-        user_id: run.user_id,
-        job_id: run.job_id,
-        tailored_resume_id: run.approved_resume_id,
-        company_name: job?.company_name || "Company",
-        role_title: job?.role_title || "Role",
-        application_url: run.target_url,
-        status: "applied",
-        submission_confirmation: confirmationMatch[0],
-        submitted_at: now,
-        last_event_at: now,
-      });
+    if (finalizeError) {
+      throw new Error(
+        "Application submitted, but Kernor could not finalize it: " + finalizeError.message
+      );
     }
-
-    const creditReference = applicationCreditReference(runId);
-    const { error: creditError } = await supabase.from("credit_transactions").insert({
-      user_id: run.user_id,
-      credit_type: "application",
-      delta: -1,
-      reason: "successful_application",
-      external_reference: creditReference,
-      metadata: {
-        application_run_id: runId,
-        job_id: run.job_id,
-      },
-    });
-
-    if (creditError && creditError.code !== "23505") {
-      throw new Error("Application submitted, but credit accounting failed.");
-    }
-
-    await Promise.all([
-      supabase
-        .from("job_opportunities")
-        .update({ status: "applied", updated_at: now })
-        .eq("id", run.job_id),
-      supabase
-        .from("application_runs")
-        .update({
-          status: "submitted",
-          stop_reason: null,
-          submission_confirmation: confirmationMatch[0],
-          submission_evidence: {
-            before_url: beforeUrl,
-            after_url: afterUrl,
-            confirmation_detected: true,
-            confirmation_text: confirmationMatch[0],
-          },
-          current_url: afterUrl,
-          submitted_at: now,
-          finished_at: now,
-          resume_token: null,
-          updated_at: now,
-        })
-        .eq("id", runId),
-    ]);
 
     await logEvent(runId, run.user_id, "submitted", "Application submission confirmed.", {
       url: afterUrl,
