@@ -88,13 +88,12 @@ v0.3: resume tailoring, diff review, explicit approval\nv0.4: credits + Stripe b
 v0.7: provider-neutral Email + Calendar detection\nv0.8: Interview Workspace / Readiness
 v0.9: Multi-Round Interview Memory
 v0.10: Kernor Live realtime interview assistant
+v0.11: Post-Interview Analysis + Follow-Up
 
-Next expected milestones:
-- application credits + Stripe
-- controlled browser application workflow
-- application tracking
-- post-interview analysis + follow-up (Phase 11)
+Next expected milestone:
 - integration, merge, runtime QA in VS Code + Codex
+- connect Vercel and production API credentials
+- end-to-end browser testing
 
 
 ## Integration rules
@@ -125,3 +124,13 @@ Next expected milestones:
 - A Live pass is consumed only after the realtime connection successfully activates.
 - Reconnects to the same active Live session must be idempotent.
 - Live guidance must remain grounded in frozen verified candidate context.
+
+
+## Post-interview rules
+
+- Analysis is factual and non-predictive.
+- Do not score the interview or estimate hiring probability.
+- Mixed-audio transcripts may have uncertain speaker attribution; state limitations.
+- Preserve user-entered round notes when merging transcript-derived memory.
+- Follow-up drafts require user review/approval before send.
+- Outbound email authorization must remain separate from read-only detection permissions.
