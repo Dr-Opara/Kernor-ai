@@ -87,13 +87,14 @@ v0.2: Kernor Match
 v0.3: resume tailoring, diff review, explicit approval\nv0.4: credits + Stripe billing\nv0.5: Kernor Apply assisted browser workflow\nv0.6: Kernor Track application lifecycle
 v0.7: provider-neutral Email + Calendar detection\nv0.8: Interview Workspace / Readiness
 v0.9: Multi-Round Interview Memory
+v0.10: Kernor Live realtime interview assistant
 
 Next expected milestones:
 - application credits + Stripe
 - controlled browser application workflow
 - application tracking
-- Kernor Live (Phase 10; move primary development to VS Code + Codex)
 - post-interview analysis + follow-up (Phase 11)
+- integration, merge, runtime QA in VS Code + Codex
 
 
 ## Integration rules
@@ -114,3 +115,13 @@ Next expected milestones:
 - Prior-round memory should improve continuity, not encourage fabricated stories.
 - Phase 10 Live can populate this model from transcript context.
 - Full post-interview analysis belongs after Live.
+
+
+## Live interview rules
+
+- The candidate remains the actual speaker.
+- Require explicit audio consent before transcription.
+- Do not implement stealth, concealment, monitoring bypass, anti-cheat evasion, or employer-control circumvention.
+- A Live pass is consumed only after the realtime connection successfully activates.
+- Reconnects to the same active Live session must be idempotent.
+- Live guidance must remain grounded in frozen verified candidate context.
