@@ -27,11 +27,7 @@ export default async function IntegrationsPage({
     outbound?: string;
   }>;
 }) {
-  const { connected, error, outbound } = await searchParams as {
-    connected?: string;
-    error?: string;
-    outbound?: string;
-  };
+  const { connected, error, outbound } = await searchParams;
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
   const userId = auth?.claims?.sub;
