@@ -113,3 +113,24 @@ The default candidate threshold remains **85%+**.
 Resume parsing and match assessment are performed server-side. The OpenAI API key is never exposed to the browser, and model requests are configured with storage disabled.
 
 PDF resumes are passed as file input. DOCX resumes are converted to raw text server-side before structured extraction.
+
+
+## Kernor Resume v0.3
+
+Resume Tailoring adds:
+
+- job-targeted resume generation from verified facts
+- auditable change records
+- before/after diff review
+- verified evidence for every material rewrite
+- regenerate into a new version
+- explicit user approval
+- approved resume version frozen for the future application workflow
+
+Kernor never adds unsupported qualifications to improve a match.
+
+## Codex development
+
+The repository includes `AGENTS.md` with persistent product, security, AI, billing, and UX rules for Codex.
+
+See `docs/development/codex.md` for the recommended VS Code + Codex workflow.
