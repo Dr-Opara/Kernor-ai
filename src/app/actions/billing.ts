@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { billingCatalog, type BillingSku } from "@/lib/billing/catalog";
 
 export async function createCheckoutSession(sku: BillingSku) {
@@ -19,7 +19,7 @@ export async function createCheckoutSession(sku: BillingSku) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   if (!siteUrl) redirect("/billing?error=Billing%20is%20not%20configured");
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "payment",
     customer_email: email,
     line_items: [{

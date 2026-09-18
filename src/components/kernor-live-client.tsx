@@ -122,6 +122,7 @@ export default function KernorLiveClient({
   const channelRef = useRef<RTCDataChannel | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const partialRef = useRef<Record<string, string>>({});
+  const manualRequestIdRef = useRef(0);
 
   const canStart = consent && interviewPasses > 0 && state === "idle";
 
@@ -363,7 +364,8 @@ export default function KernorLiveClient({
     setError("");
 
     try {
-      const itemId = `manual-${mode}-${Date.now()}`;
+      manualRequestIdRef.current += 1;
+      const itemId = `manual-${mode}-${manualRequestIdRef.current}`;
       const data = await saveTranscriptAndGuide(
         itemId,
         lastQuestion,
@@ -484,7 +486,7 @@ export default function KernorLiveClient({
               className="btn btn-primary"
               type="button"
               onClick={startLive}
-              disabled={!consent || interviewPasses < 1 || state === "connecting"}
+              disabled={!consent || interviewPasses < 1}
             >
               Start Kernor Live
             </button>

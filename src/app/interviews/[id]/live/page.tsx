@@ -3,6 +3,18 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import KernorLiveClient from "@/components/kernor-live-client";
 
+// See the note in src/app/applications/page.tsx: the Supabase client infers
+// array typing for this embedded to-one relationship until generated
+// database types are wired in. This reflects the actual runtime shape.
+type InterviewWithApplication = {
+  id: string;
+  stage: string | null;
+  scheduled_at: string | null;
+  meeting_provider: string | null;
+  status: string;
+  applications: { company_name: string | null; role_title: string | null } | null;
+};
+
 export default async function KernorLivePage({
   params,
 }: {
@@ -15,7 +27,7 @@ export default async function KernorLivePage({
 
   if (!userId) redirect("/login");
 
-  const [{ data: interview }, { data: credits }, { data: liveSession }] =
+  const [{ data: interviewData }, { data: credits }, { data: liveSession }] =
     await Promise.all([
       supabase
         .from("interviews")
@@ -35,6 +47,8 @@ export default async function KernorLivePage({
         .eq("user_id", userId)
         .maybeSingle(),
     ]);
+
+  const interview = interviewData as unknown as InterviewWithApplication | null;
 
   if (!interview) notFound();
 

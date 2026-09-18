@@ -56,6 +56,8 @@ export async function fetchRecentImapMessages(
         },
         { uid: true }
       )) {
+        if (!message.source) continue;
+
         const parsed = await simpleParser(message.source);
 
         messages.push({
@@ -71,7 +73,9 @@ export async function fetchRecentImapMessages(
           body: parsed.text || "",
           occurredAt:
             parsed.date?.toISOString() ||
-            message.envelope?.date?.toISOString() ||
+            (message.envelope?.date
+              ? new Date(message.envelope.date).toISOString()
+              : "") ||
             new Date().toISOString(),
         });
       }

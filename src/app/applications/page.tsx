@@ -3,6 +3,21 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { statusLabel } from "@/lib/applications/status";
 
+// Supabase's client falls back to array typing for embedded to-one
+// relationships until generated database types are wired in (tracked
+// separately as part of the Supabase migration work). This reflects the
+// actual single-row shape returned at runtime for applications.job_opportunities.
+type ApplicationRow = {
+  id: string;
+  company_name: string | null;
+  role_title: string | null;
+  status: string;
+  last_event_at: string | null;
+  submitted_at: string | null;
+  match_score_snapshot: number | null;
+  job_opportunities: { match_score: number | null } | null;
+};
+
 const filterStatuses = [
   ["all", "All"],
   ["applied", "Applied"],
@@ -37,7 +52,8 @@ export default async function ApplicationsPage({
     );
   }
 
-  const { data: applications } = await query;
+  const { data: applicationsData } = await query;
+  const applications = applicationsData as unknown as ApplicationRow[] | null;
 
   return (
     <main className="shell" style={{ padding: "54px 0 90px" }}>
