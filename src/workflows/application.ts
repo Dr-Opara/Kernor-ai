@@ -55,6 +55,11 @@ export async function applicationWorkflow(runId: string) {
         return result;
       }
 
+      if ("autoContinue" in result && result.autoContinue) {
+        action = "continue";
+        continue;
+      }
+
       const token = `apply:${runId}:${turn}`;
       await setResumeToken(runId, token);
 
