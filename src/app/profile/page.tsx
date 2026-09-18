@@ -26,12 +26,12 @@ export default async function ProfilePage() {
         <div className="card profile-integration-card">
           <div>
             <div className="muted" style={{ fontSize: 13 }}>Integrations</div>
-            <h2 style={{ fontSize: 22, margin: "7px 0 6px" }}>Gmail + Google Calendar</h2>
+            <h2 style={{ fontSize: 22, margin: "7px 0 6px" }}>Email + Calendar</h2>
             <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>
               Let Kernor detect employer responses, assessments, interview invitations, and scheduled interviews.
             </p>
           </div>
-          <Link href="/integrations/google" className="btn btn-secondary">
+          <Link href="/integrations" className="btn btn-secondary">
             Manage Google
           </Link>
         </div>
