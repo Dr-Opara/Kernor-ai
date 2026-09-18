@@ -221,7 +221,7 @@ Each application freezes:
 - the exact job context
 - the exact approved resume used
 
-The application timeline stores system, user, Gmail, and Calendar events in one history.
+The application timeline stores system, user, Email, and Calendar events in one history.
 
 ### User experience
 
@@ -231,3 +231,62 @@ The application timeline stores system, user, Gmail, and Calendar events in one 
 - Review every status event
 - Add a manual status update and note
 - Open linked interview context when available
+
+
+## Google Interview Detection v0.7
+
+Phase 7 connects read-only Email and Google Calendar context to Kernor Track.
+
+### Detection
+
+Kernor can detect:
+- recruiter / employer responses
+- assessments and take-home requests
+- interview invitations and scheduling updates
+- offers
+- rejections
+- Google Calendar interview events
+
+Signals are deduplicated and linked to an existing tracked application before Kernor changes the pipeline.
+
+When an interview is detected, Kernor creates an interview record connected to:
+- the application
+- exact submitted resume
+- job context
+- meeting time when available
+- meeting platform / link when available
+- interviewer details when available
+
+Ambiguous messages are not allowed to silently move an application.
+
+### Access
+
+Phase 7 requests only:
+- Email read-only
+- Google Calendar events read-only
+
+See `docs/integrations/google.md` for Vercel Connect configuration.
+
+
+## Provider-neutral Email + Calendar Detection
+
+Phase 7 is provider-agnostic.
+
+### Email providers
+
+- Google / Gmail / Google Workspace
+- Microsoft Outlook / Hotmail / Microsoft 365
+- Yahoo Mail
+- iCloud Mail
+- Custom IMAP-compatible mailboxes
+
+### Calendar providers
+
+- Google Calendar
+- Microsoft Outlook / Microsoft 365 Calendar
+
+Email and Calendar are separate connection types. A user can connect Yahoo for email and Google Calendar for interviews, Microsoft email with no calendar, or any other supported combination.
+
+OAuth providers use Vercel Connect. iCloud/custom IMAP secrets are stored in Supabase Vault; normal application tables store only the Vault secret reference.
+
+The normalized downstream signal type is always either `email` or `calendar`; provider identity is stored separately.

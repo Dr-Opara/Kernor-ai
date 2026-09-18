@@ -22,6 +22,19 @@ export default async function ProfilePage() {
         <h1 style={{ fontSize: 46, letterSpacing: "-0.05em", marginBottom: 10 }}>Profile</h1>
         <p className="muted">The verified information Kernor uses on your behalf.</p>
         <ProfileForm userId={userId} initial={profile} />
+
+        <div className="card profile-integration-card">
+          <div>
+            <div className="muted" style={{ fontSize: 13 }}>Integrations</div>
+            <h2 style={{ fontSize: 22, margin: "7px 0 6px" }}>Email + Calendar</h2>
+            <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>
+              Let Kernor detect employer responses, assessments, interview invitations, and scheduled interviews.
+            </p>
+          </div>
+          <Link href="/integrations" className="btn btn-secondary">
+            Manage Google
+          </Link>
+        </div>
       </div>
     </main>
   );

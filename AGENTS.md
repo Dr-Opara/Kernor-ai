@@ -85,11 +85,22 @@ Avoid robotic language:
 v0.1: foundation, auth, onboarding, dashboard
 v0.2: Kernor Match
 v0.3: resume tailoring, diff review, explicit approval\nv0.4: credits + Stripe billing\nv0.5: Kernor Apply assisted browser workflow\nv0.6: Kernor Track application lifecycle
+v0.7: provider-neutral Email + Calendar detection
 
 Next expected milestones:
 - application credits + Stripe
 - controlled browser application workflow
 - application tracking
-- email/calendar interview detection
-- interview workspace
+- interview workspace / readiness
 - Kernor Live
+- post-interview analysis + follow-up
+
+
+## Integration rules
+
+- Email and Calendar are independent capabilities.
+- Never make Gmail a product dependency.
+- Normalize provider signals before they reach application tracking.
+- OAuth providers should use the narrowest read-only scopes needed.
+- iCloud/custom IMAP secrets must stay in Supabase Vault, not ordinary tables.
+- Ambiguous messages must not silently change application status.

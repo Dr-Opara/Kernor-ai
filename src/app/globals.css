@@ -718,3 +718,126 @@ button, input, textarea { font: inherit; }
     grid-template-columns: 1fr;
   }
 }
+
+
+.profile-integration-card {
+  margin-top: 18px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+}
+.google-connection-card {
+  margin-top: 28px;
+  padding: 26px;
+  display: flex;
+  justify-content: space-between;
+  gap: 26px;
+  align-items: center;
+}
+.google-sync-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.google-sync-card {
+  padding: 21px;
+  display: grid;
+  gap: 8px;
+}
+.google-sync-card strong {
+  font-size: 20px;
+}
+.google-privacy-card {
+  margin-top: 14px;
+  padding: 24px;
+}
+.google-detection-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+.google-detection-list span {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 680px) {
+  .profile-integration-card,
+  .google-connection-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .google-sync-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.integration-summary-row {
+  margin-top: 26px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.integration-section {
+  margin-top: 38px;
+}
+.integration-account-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+.integration-account-row {
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+.integration-provider-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 14px;
+}
+.integration-provider-card {
+  padding: 22px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+.integration-provider-wide {
+  grid-column: 1 / -1;
+}
+.integration-mini-form,
+.integration-connect-form {
+  display: grid;
+  gap: 10px;
+}
+.integration-imap-grid {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: 10px;
+}
+
+@media (max-width: 700px) {
+  .integration-provider-grid,
+  .integration-imap-grid {
+    grid-template-columns: 1fr;
+  }
+  .integration-provider-wide {
+    grid-column: auto;
+  }
+  .integration-account-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
