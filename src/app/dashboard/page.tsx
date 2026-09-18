@@ -52,7 +52,7 @@ export default async function DashboardPage() {
               {bestJob || applications?.length || nextInterview ? "Here’s what needs your attention." : "Kernor is ready for your first move."}
             </p>
           </div>
-          <button className="btn btn-primary">Find jobs</button>
+          <Link className="btn btn-primary" href="/match">Check a job</Link>
         </div>
 
         <div className="dashboard-main-grid">
@@ -68,7 +68,7 @@ export default async function DashboardPage() {
                   <div style={{ fontSize: 32, fontWeight: 800 }}>{bestJob.match_score ?? "—"}%</div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 28 }}>
-                  <button className="btn btn-primary">View match</button>
+                  <Link className="btn btn-primary" href={`/match/${bestJob.id}`}>View match</Link>
                 </div>
               </>
             ) : (
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
                 <p className="muted" style={{ maxWidth: 520, lineHeight: 1.6 }}>
                   Kernor will only surface roles that fit the profile and preferences you approved.
                 </p>
-                <button className="btn btn-primary" style={{ marginTop: 14 }}>Find jobs</button>
+                <Link className="btn btn-primary" href="/match" style={{ marginTop: 14 }}>Check a job</Link>
               </div>
             )}
           </div>
