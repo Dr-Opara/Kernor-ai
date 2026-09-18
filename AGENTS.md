@@ -85,7 +85,7 @@ Avoid robotic language:
 v0.1: foundation, auth, onboarding, dashboard
 v0.2: Kernor Match
 v0.3: resume tailoring, diff review, explicit approval\nv0.4: credits + Stripe billing\nv0.5: Kernor Apply assisted browser workflow\nv0.6: Kernor Track application lifecycle
-v0.7: provider-neutral Email + Calendar detection
+v0.7: provider-neutral Email + Calendar detection\nv0.8: Interview Workspace / Readiness
 
 Next expected milestones:
 - application credits + Stripe
