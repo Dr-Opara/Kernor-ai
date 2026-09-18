@@ -12,6 +12,7 @@ export async function generateInterviewReadiness(input: {
   jobSnapshot: unknown;
   resumeSnapshot: unknown;
   applicationTimeline: unknown;
+  priorRounds: unknown;
 }) {
   const result = await generateText({
     model: openai(MODEL),
@@ -49,6 +50,15 @@ ${JSON.stringify(input.resumeSnapshot)}
 
 APPLICATION TIMELINE:
 ${JSON.stringify(input.applicationTimeline)}
+
+PRIOR INTERVIEW ROUNDS:
+${JSON.stringify(input.priorRounds)}
+
+Use prior-round memory to preserve continuity:
+- avoid needlessly repeating the same examples
+- carry forward open commitments and discussion threads
+- build on topics already covered
+- do not infer outcomes or interviewer intent
 
 Generate interview readiness guidance.
 `,
