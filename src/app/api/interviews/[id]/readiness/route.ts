@@ -16,23 +16,23 @@ export async function POST(
     return NextResponse.json({ error: "Please sign in again." }, { status: 401 });
   }
 
-  const [{ data: interview }, { data: timeline }] = await Promise.all([
-    supabase
-      .from("interviews")
-      .select("*,applications(*)")
-      .eq("id", id)
-      .eq("user_id", userId)
-      .maybeSingle(),
-    supabase
-      .from("application_status_events")
-      .select("title,detail,source,occurred_at")
-      .eq("user_id", userId)
-      .order("occurred_at", { ascending: true }),
-  ]);
+  const { data: interview } = await supabase
+    .from("interviews")
+    .select("*,applications(*)")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .maybeSingle();
 
   if (!interview?.applications) {
     return NextResponse.json({ error: "Interview context is incomplete." }, { status: 404 });
   }
+
+  const { data: timeline } = await supabase
+    .from("application_status_events")
+    .select("title,detail,source,occurred_at")
+    .eq("user_id", userId)
+    .eq("application_id", interview.application_id)
+    .order("occurred_at", { ascending: true });
 
   try {
     const briefing = await generateInterviewReadiness({
@@ -42,12 +42,7 @@ export async function POST(
       interviewType: interview.interview_type,
       jobSnapshot: interview.applications.job_snapshot,
       resumeSnapshot: interview.applications.resume_snapshot,
-      applicationTimeline:
-        timeline?.filter(
-          (event) =>
-            interview.applications &&
-            event
-        ) || [],
+      applicationTimeline: timeline || [],
     });
 
     const service = createServiceClient();
