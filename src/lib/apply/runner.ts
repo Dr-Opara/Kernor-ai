@@ -266,6 +266,108 @@ async function saveQuestions(
   }
 }
 
+
+async function finalizeConfirmedExistingSubmission(input: {
+  run: any;
+  confirmation: string;
+  pageUrl: string;
+  browserSessionId: string;
+}) {
+  const supabase = createServiceClient();
+  const now = new Date().toISOString();
+
+  const { data: existingApplication } = await supabase
+    .from("applications")
+    .select("id")
+    .eq("user_id", input.run.user_id)
+    .eq("job_id", input.run.job_id)
+    .maybeSingle();
+
+  if (existingApplication) {
+    await supabase
+      .from("applications")
+      .update({
+        tailored_resume_id: input.run.approved_resume_id,
+        application_url: input.run.target_url,
+        status: "applied",
+        submission_confirmation: input.confirmation,
+        submitted_at: now,
+        last_event_at: now,
+        updated_at: now,
+      })
+      .eq("id", existingApplication.id);
+  } else {
+    const { data: job } = await supabase
+      .from("job_opportunities")
+      .select("company_name,role_title")
+      .eq("id", input.run.job_id)
+      .single();
+
+    await supabase.from("applications").insert({
+      user_id: input.run.user_id,
+      job_id: input.run.job_id,
+      tailored_resume_id: input.run.approved_resume_id,
+      company_name: job?.company_name || "Company",
+      role_title: job?.role_title || "Role",
+      application_url: input.run.target_url,
+      status: "applied",
+      submission_confirmation: input.confirmation,
+      submitted_at: now,
+      last_event_at: now,
+    });
+  }
+
+  const { error: creditError } = await supabase.from("credit_transactions").insert({
+    user_id: input.run.user_id,
+    credit_type: "application",
+    delta: -1,
+    reason: "successful_application",
+    external_reference: `application:${input.run.id}`,
+    metadata: {
+      application_run_id: input.run.id,
+      job_id: input.run.job_id,
+    },
+  });
+
+  if (creditError && creditError.code !== "23505") {
+    throw new Error("Application confirmed, but credit accounting failed.");
+  }
+
+  await Promise.all([
+    supabase
+      .from("job_opportunities")
+      .update({ status: "applied", updated_at: now })
+      .eq("id", input.run.job_id),
+    supabase
+      .from("application_runs")
+      .update({
+        status: "submitted",
+        stop_reason: null,
+        submission_confirmation: input.confirmation,
+        submission_evidence: {
+          after_url: input.pageUrl,
+          confirmation_detected: true,
+          confirmation_text: input.confirmation,
+          detected_on_resume: true,
+        },
+        current_url: input.pageUrl,
+        submitted_at: now,
+        finished_at: now,
+        resume_token: null,
+        updated_at: now,
+      })
+      .eq("id", input.run.id),
+  ]);
+
+  await logEvent(input.run.id, input.run.user_id, "submitted", "Application submission confirmed.", {
+    url: input.pageUrl,
+  });
+  await logEvent(input.run.id, input.run.user_id, "credit_consumed", "One application credit consumed.");
+  await releaseApplicationBrowserSession(input.browserSessionId).catch(() => undefined);
+
+  return { terminal: true, status: "submitted" as const };
+}
+
 export async function runApplicationPass(runId: string, command: ApplyCommand) {
   const supabase = createServiceClient();
 
@@ -392,6 +494,20 @@ export async function runApplicationPass(runId: string, command: ApplyCommand) {
         updated_at: new Date().toISOString(),
       })
       .eq("id", runId);
+
+    const currentBody = (await page.locator("body").innerText().catch(() => "")).slice(0, 12000);
+    const resumedConfirmation = currentBody.match(
+      /thank you for applying|application (?:has been )?submitted|application received|successfully applied|we received your application|thanks for applying/i
+    );
+
+    if (resumedConfirmation && run.status !== "queued" && run.status !== "preflight") {
+      return finalizeConfirmedExistingSubmission({
+        run,
+        confirmation: resumedConfirmation[0],
+        pageUrl: page.url(),
+        browserSessionId: browserSession.id,
+      });
+    }
 
     const gate = await pageHasHumanGate(page);
     if (gate) {
