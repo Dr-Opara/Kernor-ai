@@ -24,9 +24,10 @@ export default async function IntegrationsPage({
   searchParams: Promise<{
     connected?: string;
     error?: string;
+    outbound?: string;
   }>;
 }) {
-  const { connected, error } = await searchParams;
+  const { connected, error, outbound } = await searchParams;
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
   const userId = auth?.claims?.sub;
@@ -124,6 +125,12 @@ export default async function IntegrationsPage({
           </div>
         ) : null}
 
+        {outbound ? (
+          <div className="billing-success" style={{ marginTop: 18 }}>
+            Follow-up sending authorization completed for {outbound}.
+          </div>
+        ) : null}
+
         <div className="integration-summary-row">
           <div>
             <strong>{accounts?.filter((item) => item.status === "connected").length || 0}</strong>
@@ -213,6 +220,42 @@ export default async function IntegrationsPage({
                 Custom domain or IMAP-compatible mailbox
               </span>
               <ImapConnectForm provider="imap" />
+            </div>
+          </div>
+        </section>
+
+        <section className="integration-section">
+          <div>
+            <div className="muted" style={{ fontSize: 13 }}>Optional follow-up sending</div>
+            <h2 style={{ fontSize: 28, margin: "7px 0 6px" }}>
+              Send approved follow-ups from Kernor
+            </h2>
+            <p className="muted" style={{ margin: 0 }}>
+              This permission is separate from read-only detection. Skip it if you prefer Kernor to open approved drafts in your normal email app.
+            </p>
+          </div>
+
+          <div className="integration-provider-grid">
+            <div className="card integration-provider-card">
+              <strong>Google send</strong>
+              <span className="muted">Optional Gmail send permission for approved follow-ups only.</span>
+              <a
+                className="btn btn-secondary"
+                href="/api/integrations/outbound/connect?provider=google"
+              >
+                Enable sending
+              </a>
+            </div>
+
+            <div className="card integration-provider-card">
+              <strong>Microsoft send</strong>
+              <span className="muted">Optional Outlook / Microsoft 365 send permission for approved follow-ups only.</span>
+              <a
+                className="btn btn-secondary"
+                href="/api/integrations/outbound/connect?provider=microsoft"
+              >
+                Enable sending
+              </a>
             </div>
           </div>
         </section>

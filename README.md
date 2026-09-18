@@ -380,3 +380,46 @@ Reconnecting the same active session does not consume another pass.
 - Kernor requires explicit audio consent.
 - Shared video is immediately discarded; only the shared audio track is used.
 - Guidance may use only verified candidate context.
+
+
+## Post-Interview Analysis + Follow-Up v0.11
+
+Phase 11 closes the interview loop after Kernor Live.
+
+### Analysis
+
+After a completed Live session, Kernor can generate:
+- factual interview summary
+- transcript limitations
+- clearly supported questions asked
+- topics discussed
+- experiences referenced
+- commitments / follow-ups
+- answers that could be strengthened in a future round
+- possible next-round preparation topics
+
+Kernor does not:
+- score the interview
+- predict whether the candidate will advance
+- infer hidden interviewer intent
+- treat mixed-audio transcript speaker attribution as certain
+
+### Round memory
+
+Transcript-backed facts are merged into the current interview round memory.
+
+Existing user-entered notes/signals are preserved rather than overwritten.
+
+The updated handoff becomes context for future interview readiness.
+
+### Follow-up
+
+Kernor creates an editable follow-up draft from actual interview context.
+
+The candidate must review/approve it before sending.
+
+If an outbound Google or Microsoft connector is configured, Kernor can send the approved draft through that provider.
+
+Otherwise Kernor opens the approved draft in the user's normal email app using a mailto handoff.
+
+Read-only Email/Calendar connectors remain separate from optional outbound-send connectors.

@@ -34,6 +34,8 @@ export default async function InterviewWorkspacePage({
     { data: timeline },
     { data: currentMemory },
     { data: allRoundMemory },
+    { data: liveSession },
+    { data: postAnalysis },
   ] = await Promise.all([
     supabase
       .from("interview_readiness")
@@ -62,6 +64,20 @@ export default async function InterviewWorkspacePage({
       .eq("application_id", interview.application_id)
       .eq("user_id", userId)
       .order("round_number", { ascending: true }),
+    supabase
+      .from("live_interview_sessions")
+      .select("id,status,ended_at")
+      .eq("interview_id", id)
+      .eq("user_id", userId)
+      .maybeSingle(),
+    supabase
+      .from("post_interview_analyses")
+      .select("id,version_number")
+      .eq("interview_id", id)
+      .eq("user_id", userId)
+      .order("version_number", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   const parsedReadiness = readiness
@@ -391,16 +407,27 @@ export default async function InterviewWorkspacePage({
 
           <div className="card interview-live-card">
             <div className="muted" style={{ fontSize: 13 }}>
-              Kernor Live
+              {liveSession?.status === "ended" ? "Post-interview" : "Kernor Live"}
             </div>
             <h3 style={{ fontSize: 22, margin: "7px 0 7px" }}>
-              Live interview assistance
+              {liveSession?.status === "ended"
+                ? postAnalysis
+                  ? "Analysis is ready"
+                  : "Interview transcript is ready"
+                : "Live interview assistance"}
             </h3>
             <p className="muted" style={{ margin: "0 0 16px", lineHeight: 1.55 }}>
-              This workspace is free. One interview pass is used only after the realtime connection successfully starts.
+              {liveSession?.status === "ended"
+                ? "Turn the completed transcript into factual round memory, preparation context, and a reviewable follow-up."
+                : "This workspace is free. One interview pass is used only after the realtime connection successfully starts."}
             </p>
-            {interview.status === "completed" ? (
-              <div className="badge">Interview completed</div>
+            {liveSession?.status === "ended" ? (
+              <Link
+                className="btn btn-primary"
+                href={`/interviews/${interview.id}/analysis`}
+              >
+                {postAnalysis ? "View analysis" : "Analyze interview"}
+              </Link>
             ) : (
               <Link className="btn btn-primary" href={`/interviews/${interview.id}/live`}>
                 Start Kernor Live
