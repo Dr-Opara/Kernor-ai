@@ -180,6 +180,7 @@ export type LiveGuidance = z.infer<typeof liveGuidanceSchema>;
 
 export const postInterviewAnalysisSchema = z.object({
   factualSummary: z.string(),
+  transcriptLimitations: z.array(z.string()).max(8),
   questionsAsked: z.array(z.string()).max(30),
   topicsDiscussed: z.array(z.string()).max(30),
   experiencesReferenced: z.array(z.string()).max(20),
