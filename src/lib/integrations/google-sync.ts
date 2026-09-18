@@ -73,7 +73,7 @@ async function googleFetch(token: string, url: string) {
   return response.json();
 }
 
-async function updateApplicationFromSignal(input: {
+export async function updateApplicationFromSignal(input: {
   userId: string;
   application: TrackedApplication;
   signalId: string;
@@ -124,7 +124,7 @@ async function updateApplicationFromSignal(input: {
   });
 }
 
-async function upsertInterview(input: {
+export async function upsertInterview(input: {
   userId: string;
   applicationId: string;
   source: "email" | "calendar";
@@ -196,10 +196,11 @@ async function upsertInterview(input: {
   return interview?.id || null;
 }
 
-async function syncEmail(
+export async function syncGoogleEmail(
   userId: string,
   token: string,
-  applications: TrackedApplication[]
+  applications: TrackedApplication[],
+  accountId?: string | null
 ) {
   const service = createServiceClient();
   const query = encodeURIComponent(
@@ -208,7 +209,7 @@ async function syncEmail(
 
   const list = await googleFetch(
     token,
-    `https://email.googleapis.com/email/v1/users/me/messages?maxResults=25&q=${query}`
+    `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=25&q=${query}`
   );
 
   let processed = 0;
@@ -219,14 +220,14 @@ async function syncEmail(
       .select("id")
       .eq("user_id", userId)
       .eq("source", "email")
-      .eq("external_id", item.id)
+      .eq("external_id", `google:${item.id}`)
       .maybeSingle();
 
     if (existing) continue;
 
     const message = await googleFetch(
       token,
-      `https://email.googleapis.com/email/v1/users/me/messages/${item.id}?format=full`
+      `https://gmail.googleapis.com/gmail/v1/users/me/messages/${item.id}?format=full`
     );
 
     const subject = header(message.payload, "Subject");
@@ -263,8 +264,9 @@ async function syncEmail(
       .insert({
         user_id: userId,
         application_id: application.id,
+        integration_account_id: accountId || null,
         source: "email",
-        external_id: item.id,
+        external_id: `google:${item.id}`,
         signal_type: signalType,
         title: subject,
         sender,
@@ -310,7 +312,7 @@ async function syncEmail(
         userId,
         applicationId: application.id,
         source: "email",
-        externalId: item.id,
+        externalId: `google:${item.id}`,
         signalId: signal.id,
         stage: extracted?.stage,
         scheduledAt: extracted?.scheduledAt,
@@ -330,10 +332,11 @@ async function syncEmail(
   return processed;
 }
 
-async function syncCalendar(
+export async function syncGoogleCalendar(
   userId: string,
   token: string,
-  applications: TrackedApplication[]
+  applications: TrackedApplication[],
+  accountId?: string | null
 ) {
   const service = createServiceClient();
   const now = new Date();
@@ -356,7 +359,7 @@ async function syncCalendar(
   let processed = 0;
 
   for (const event of data.items || []) {
-    const externalId = event.id;
+    const externalId = `google:${event.id}`;
     if (!externalId || event.status === "cancelled") continue;
 
     const { data: existing } = await service
@@ -401,6 +404,7 @@ async function syncCalendar(
       .insert({
         user_id: userId,
         application_id: application.id,
+        integration_account_id: accountId || null,
         source: "calendar",
         external_id: externalId,
         signal_type: "interview_invite",
@@ -475,8 +479,8 @@ export async function syncGoogleForUser(userId: string) {
     const tracked = (applications || []) as TrackedApplication[];
 
     const [emailCount, calendarCount] = await Promise.all([
-      syncEmail(userId, token, tracked),
-      syncCalendar(userId, token, tracked),
+      syncGoogleEmail(userId, token, tracked),
+      syncGoogleCalendar(userId, token, tracked),
     ]);
 
     await service.from("integration_connections").upsert({
