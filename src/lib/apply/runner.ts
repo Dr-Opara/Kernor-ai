@@ -18,6 +18,7 @@ type FieldDescriptor = {
   label: string;
   placeholder: string;
   value: string;
+  checked: boolean;
 };
 
 async function logEvent(
@@ -104,6 +105,7 @@ async function collectFields(page: Page): Promise<FieldDescriptor[]> {
           .slice(0, 1000),
         placeholder: input.placeholder || "",
         value: input.value || "",
+        checked: Boolean(input.checked),
       };
     })
   );
@@ -211,25 +213,52 @@ async function resolveField(
   }
 }
 
-async function findSubmitButton(page: Page) {
-  const patterns = [
+async function findApplicationAction(page: Page) {
+  const finalPatterns = [
     /^submit application$/i,
     /^submit$/i,
-    /^apply$/i,
     /^send application$/i,
     /^complete application$/i,
   ];
+  const progressPatterns = [
+    /^next$/i,
+    /^continue$/i,
+    /^save and continue$/i,
+    /^review$/i,
+    /^review application$/i,
+    /^apply now$/i,
+    /^apply$/i,
+  ];
 
-  for (const pattern of patterns) {
+  for (const pattern of finalPatterns) {
     const candidate = page.getByRole("button", { name: pattern }).first();
     if ((await candidate.count()) > 0 && (await candidate.isVisible().catch(() => false))) {
-      return candidate;
+      return { kind: "final" as const, locator: candidate };
+    }
+  }
+
+  for (const pattern of progressPatterns) {
+    const candidate = page.getByRole("button", { name: pattern }).first();
+    if ((await candidate.count()) > 0 && (await candidate.isVisible().catch(() => false))) {
+      return { kind: "progress" as const, locator: candidate };
     }
   }
 
   const fallback = page.locator('button[type="submit"], input[type="submit"]').last();
   if ((await fallback.count()) > 0 && (await fallback.isVisible().catch(() => false))) {
-    return fallback;
+    const text = cleanLabel(
+      (await fallback.textContent().catch(() => "")) ||
+      (await fallback.getAttribute("value").catch(() => "")) ||
+      ""
+    );
+
+    if (finalPatterns.some((pattern) => pattern.test(text))) {
+      return { kind: "final" as const, locator: fallback };
+    }
+
+    if (progressPatterns.some((pattern) => pattern.test(text))) {
+      return { kind: "progress" as const, locator: fallback };
+    }
   }
 
   return null;
@@ -570,6 +599,12 @@ export async function runApplicationPass(runId: string, command: ApplyCommand) {
 
       if (!visible || !enabled || field.type === "file") continue;
 
+      const alreadyAnswered =
+        (field.type !== "checkbox" && field.type !== "radio" && field.value.trim().length > 0) ||
+        ((field.type === "checkbox" || field.type === "radio") && field.checked);
+
+      if (alreadyAnswered) continue;
+
       const result = await resolveField(locator, field, context, userAnswers);
 
       if (result.pause) {
@@ -604,10 +639,32 @@ export async function runApplicationPass(runId: string, command: ApplyCommand) {
       return { terminal: false, status: "needs_user" as const, reason };
     }
 
-    const submitButton = await findSubmitButton(page);
+    const actionButton = await findApplicationAction(page);
 
-    if (!submitButton) {
-      const reason = "Kernor could not identify the final submit control. Review the page in the live browser.";
+    if (actionButton?.kind === "progress") {
+      await actionButton.locator.click();
+      await page.waitForLoadState("domcontentloaded", { timeout: 30_000 }).catch(() => undefined);
+      await page.waitForTimeout(800);
+
+      await supabase
+        .from("application_runs")
+        .update({
+          status: "running",
+          current_url: page.url(),
+          stop_reason: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", runId);
+
+      await logEvent(runId, run.user_id, "navigated", "Moved to the next application step.", {
+        url: page.url(),
+      });
+
+      return { terminal: false, status: "running" as const, autoContinue: true };
+    }
+
+    if (!actionButton) {
+      const reason = "Kernor could not identify the next or final application control. Review the page in the live browser.";
       await supabase
         .from("application_runs")
         .update({
@@ -621,6 +678,8 @@ export async function runApplicationPass(runId: string, command: ApplyCommand) {
       await logEvent(runId, run.user_id, "paused", reason);
       return { terminal: false, status: "needs_user" as const, reason };
     }
+
+    const submitButton = actionButton.locator;
 
     if (command !== "submit") {
       await supabase
