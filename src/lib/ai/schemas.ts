@@ -154,3 +154,14 @@ export const interviewReadinessSchema = z.object({
 });
 
 export type InterviewReadiness = z.infer<typeof interviewReadinessSchema>;
+
+
+export const roundHandoffSchema = z.object({
+  summary: z.string(),
+  buildOn: z.array(z.string()).max(8),
+  avoidRepeating: z.array(z.string()).max(8),
+  openThreads: z.array(z.string()).max(8),
+  nextRoundFocus: z.array(z.string()).max(8),
+});
+
+export type RoundHandoff = z.infer<typeof roundHandoffSchema>;

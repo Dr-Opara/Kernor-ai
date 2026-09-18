@@ -27,12 +27,21 @@ export async function POST(
     return NextResponse.json({ error: "Interview context is incomplete." }, { status: 404 });
   }
 
-  const { data: timeline } = await supabase
-    .from("application_status_events")
-    .select("title,detail,source,occurred_at")
-    .eq("user_id", userId)
-    .eq("application_id", interview.application_id)
-    .order("occurred_at", { ascending: true });
+  const [{ data: timeline }, { data: priorRounds }] = await Promise.all([
+    supabase
+      .from("application_status_events")
+      .select("title,detail,source,occurred_at")
+      .eq("user_id", userId)
+      .eq("application_id", interview.application_id)
+      .order("occurred_at", { ascending: true }),
+    supabase
+      .from("interview_round_memory")
+      .select("round_number,questions_asked,topics_discussed,experiences_used,interviewer_signals,commitments,handoff_summary,created_at")
+      .eq("user_id", userId)
+      .eq("application_id", interview.application_id)
+      .neq("interview_id", id)
+      .order("round_number", { ascending: true }),
+  ]);
 
   try {
     const briefing = await generateInterviewReadiness({
@@ -43,6 +52,7 @@ export async function POST(
       jobSnapshot: interview.applications.job_snapshot,
       resumeSnapshot: interview.applications.resume_snapshot,
       applicationTimeline: timeline || [],
+      priorRounds: priorRounds || [],
     });
 
     const service = createServiceClient();

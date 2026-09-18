@@ -86,14 +86,14 @@ v0.1: foundation, auth, onboarding, dashboard
 v0.2: Kernor Match
 v0.3: resume tailoring, diff review, explicit approval\nv0.4: credits + Stripe billing\nv0.5: Kernor Apply assisted browser workflow\nv0.6: Kernor Track application lifecycle
 v0.7: provider-neutral Email + Calendar detection\nv0.8: Interview Workspace / Readiness
+v0.9: Multi-Round Interview Memory
 
 Next expected milestones:
 - application credits + Stripe
 - controlled browser application workflow
 - application tracking
-- interview workspace / readiness
-- Kernor Live
-- post-interview analysis + follow-up
+- Kernor Live (Phase 10; move primary development to VS Code + Codex)
+- post-interview analysis + follow-up (Phase 11)
 
 
 ## Integration rules
@@ -104,3 +104,13 @@ Next expected milestones:
 - OAuth providers should use the narrowest read-only scopes needed.
 - iCloud/custom IMAP secrets must stay in Supabase Vault, not ordinary tables.
 - Ambiguous messages must not silently change application status.
+
+
+## Interview memory rules
+
+- Round memory may contain user-recorded observations, questions, topics, examples, and commitments.
+- Do not treat interviewer signals as verified intent.
+- Do not predict hiring outcomes.
+- Prior-round memory should improve continuity, not encourage fabricated stories.
+- Phase 10 Live can populate this model from transcript context.
+- Full post-interview analysis belongs after Live.

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import InterviewSettingsForm from "@/components/interview-settings-form";
 import ReadinessButton from "@/components/readiness-button";
+import RoundMemoryForm from "@/components/round-memory-form";
 import { interviewReadinessSchema } from "@/lib/ai/schemas";
 
 export default async function InterviewWorkspacePage({
@@ -28,7 +29,12 @@ export default async function InterviewWorkspacePage({
 
   const application = interview.applications;
 
-  const [{ data: readiness }, { data: timeline }] = await Promise.all([
+  const [
+    { data: readiness },
+    { data: timeline },
+    { data: currentMemory },
+    { data: allRoundMemory },
+  ] = await Promise.all([
     supabase
       .from("interview_readiness")
       .select("id,version_number,briefing,created_at")
@@ -44,6 +50,18 @@ export default async function InterviewWorkspacePage({
       .eq("user_id", userId)
       .order("occurred_at", { ascending: false })
       .limit(8),
+    supabase
+      .from("interview_round_memory")
+      .select("*")
+      .eq("interview_id", id)
+      .eq("user_id", userId)
+      .maybeSingle(),
+    supabase
+      .from("interview_round_memory")
+      .select("id,interview_id,round_number,questions_asked,topics_discussed,experiences_used,commitments,handoff_summary,created_at")
+      .eq("application_id", interview.application_id)
+      .eq("user_id", userId)
+      .order("round_number", { ascending: true }),
   ]);
 
   const parsedReadiness = readiness
@@ -259,6 +277,71 @@ export default async function InterviewWorkspacePage({
               </p>
             </div>
           )}
+
+          {allRoundMemory?.length ? (
+            <div className="card interview-section-card">
+              <div className="muted" style={{ fontSize: 13 }}>
+                Multi-round memory
+              </div>
+              <h2 style={{ fontSize: 22, margin: "7px 0 8px" }}>
+                What prior rounds already covered
+              </h2>
+              <div className="round-history-list">
+                {allRoundMemory
+                  .filter((memory) => memory.interview_id !== id)
+                  .map((memory) => (
+                    <div className="round-history-item" key={memory.id}>
+                      <div className="round-history-heading">
+                        <strong>Round {memory.round_number}</strong>
+                        <span className="muted">
+                          {new Date(memory.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      {memory.handoff_summary?.summary ? (
+                        <p className="muted" style={{ lineHeight: 1.55 }}>
+                          {memory.handoff_summary.summary}
+                        </p>
+                      ) : null}
+
+                      {memory.handoff_summary?.buildOn?.length ? (
+                        <div className="round-memory-mini">
+                          <span className="muted">Build on</span>
+                          {memory.handoff_summary.buildOn.map((item: string) => (
+                            <div key={item}>• {item}</div>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      {memory.handoff_summary?.openThreads?.length ? (
+                        <div className="round-memory-mini">
+                          <span className="muted">Open threads</span>
+                          {memory.handoff_summary.openThreads.map((item: string) => (
+                            <div key={item}>• {item}</div>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ) : null}
+
+          <RoundMemoryForm
+            interviewId={interview.id}
+            initial={
+              currentMemory
+                ? {
+                    questions_asked: currentMemory.questions_asked,
+                    topics_discussed: currentMemory.topics_discussed,
+                    experiences_used: currentMemory.experiences_used,
+                    interviewer_signals: currentMemory.interviewer_signals,
+                    commitments: currentMemory.commitments,
+                    candidate_notes: currentMemory.candidate_notes,
+                  }
+                : null
+            }
+          />
 
           <div className="card interview-section-card">
             <div className="muted" style={{ fontSize: 13 }}>

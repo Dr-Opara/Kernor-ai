@@ -999,3 +999,45 @@ button, input, textarea { font: inherit; }
     text-align: left;
   }
 }
+
+
+.round-memory-card {
+  margin-top: 14px;
+  padding: 24px;
+  display: grid;
+  gap: 18px;
+}
+.round-memory-textarea {
+  min-height: 88px;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.round-memory-notes {
+  min-height: 120px;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.round-history-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 14px;
+}
+.round-history-item {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.round-history-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+.round-memory-mini {
+  margin-top: 10px;
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+  line-height: 1.5;
+}

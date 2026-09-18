@@ -318,3 +318,28 @@ Readiness can generate:
 - gaps to handle honestly
 
 Kernor does not run mock interviews in this phase.
+
+
+## Multi-Round Interview Memory v0.9
+
+Phase 9 carries interview context across rounds before Kernor Live exists.
+
+After a round, the candidate can record:
+- questions asked
+- topics discussed
+- experiences/examples used
+- interviewer comments/signals as the candidate observed them
+- commitments and follow-ups
+- additional notes
+
+Kernor creates a factual handoff that captures:
+- what to build on
+- what not to repeat unnecessarily
+- open discussion threads
+- focus areas for the next round
+
+Later interview readiness automatically includes prior-round memory.
+
+Phase 9 does not grade interview performance or predict hiring outcomes.
+
+When Kernor Live is introduced in Phase 10, transcript-derived memory can populate this same model automatically. Full post-interview analysis and follow-up remain Phase 11.
