@@ -266,3 +266,27 @@ Phase 7 requests only:
 - Google Calendar events read-only
 
 See `docs/integrations/google.md` for Vercel Connect configuration.
+
+
+## Provider-neutral Email + Calendar Detection
+
+Phase 7 is provider-agnostic.
+
+### Email providers
+
+- Google / Gmail / Google Workspace
+- Microsoft Outlook / Hotmail / Microsoft 365
+- Yahoo Mail
+- iCloud Mail
+- Custom IMAP-compatible mailboxes
+
+### Calendar providers
+
+- Google Calendar
+- Microsoft Outlook / Microsoft 365 Calendar
+
+Email and Calendar are separate connection types. A user can connect Yahoo for email and Google Calendar for interviews, Microsoft email with no calendar, or any other supported combination.
+
+OAuth providers use Vercel Connect. iCloud/custom IMAP secrets are stored in Supabase Vault; normal application tables store only the Vault secret reference.
+
+The normalized downstream signal type is always either `email` or `calendar`; provider identity is stored separately.
