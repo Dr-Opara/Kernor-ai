@@ -231,3 +231,38 @@ The application timeline stores system, user, Gmail, and Calendar events in one 
 - Review every status event
 - Add a manual status update and note
 - Open linked interview context when available
+
+
+## Google Interview Detection v0.7
+
+Phase 7 connects read-only Gmail and Google Calendar context to Kernor Track.
+
+### Detection
+
+Kernor can detect:
+- recruiter / employer responses
+- assessments and take-home requests
+- interview invitations and scheduling updates
+- offers
+- rejections
+- Google Calendar interview events
+
+Signals are deduplicated and linked to an existing tracked application before Kernor changes the pipeline.
+
+When an interview is detected, Kernor creates an interview record connected to:
+- the application
+- exact submitted resume
+- job context
+- meeting time when available
+- meeting platform / link when available
+- interviewer details when available
+
+Ambiguous messages are not allowed to silently move an application.
+
+### Access
+
+Phase 7 requests only:
+- Gmail read-only
+- Google Calendar events read-only
+
+See `docs/integrations/google.md` for Vercel Connect configuration.
