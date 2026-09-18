@@ -48,7 +48,7 @@ export async function syncMicrosoftEmail(
       .from("external_signals")
       .select("id")
       .eq("user_id", userId)
-      .eq("source", "gmail")
+      .eq("source", "email")
       .eq("external_id", `microsoft:${externalId}`)
       .maybeSingle();
 
@@ -80,7 +80,7 @@ export async function syncMicrosoftEmail(
         user_id: userId,
         application_id: application.id,
         integration_account_id: accountId,
-        source: "gmail",
+        source: "email",
         external_id: `microsoft:${externalId}`,
         signal_type: extracted.signalType,
         title: message.subject || "",
@@ -113,7 +113,7 @@ export async function syncMicrosoftEmail(
         to_status: status,
         title: "Employer update detected",
         detail: extracted.conciseSummary,
-        source: "gmail",
+        source: "email",
         metadata: {
           signal_id: signal.id,
           provider: "microsoft",
