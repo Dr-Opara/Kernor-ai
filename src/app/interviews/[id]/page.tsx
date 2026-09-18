@@ -394,11 +394,18 @@ export default async function InterviewWorkspacePage({
               Kernor Live
             </div>
             <h3 style={{ fontSize: 22, margin: "7px 0 7px" }}>
-              Live assistance comes in Phase 10.
+              Live interview assistance
             </h3>
-            <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>
-              This workspace is free. No interview pass is used for preparation.
+            <p className="muted" style={{ margin: "0 0 16px", lineHeight: 1.55 }}>
+              This workspace is free. One interview pass is used only after the realtime connection successfully starts.
             </p>
+            {interview.status === "completed" ? (
+              <div className="badge">Interview completed</div>
+            ) : (
+              <Link className="btn btn-primary" href={`/interviews/${interview.id}/live`}>
+                Start Kernor Live
+              </Link>
+            )}
           </div>
 
           <div className="card interview-section-card">
