@@ -78,7 +78,7 @@ async function updateApplicationFromSignal(input: {
   application: TrackedApplication;
   signalId: string;
   signalType: SignalType;
-  source: "gmail" | "calendar";
+  source: "email" | "calendar";
   detail: string;
 }) {
   const status = statusForSignal(input.signalType);
@@ -103,7 +103,7 @@ async function updateApplicationFromSignal(input: {
     application_id: input.application.id,
     user_id: input.userId,
     event_type:
-      input.source === "gmail"
+      input.source === "email"
         ? "email_detected"
         : "calendar_detected",
     from_status: input.application.status,
@@ -127,7 +127,7 @@ async function updateApplicationFromSignal(input: {
 async function upsertInterview(input: {
   userId: string;
   applicationId: string;
-  source: "gmail" | "calendar";
+  source: "email" | "calendar";
   externalId: string;
   signalId: string;
   stage?: string | null;
@@ -196,7 +196,7 @@ async function upsertInterview(input: {
   return interview?.id || null;
 }
 
-async function syncGmail(
+async function syncEmail(
   userId: string,
   token: string,
   applications: TrackedApplication[]
@@ -208,7 +208,7 @@ async function syncGmail(
 
   const list = await googleFetch(
     token,
-    `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=25&q=${query}`
+    `https://email.googleapis.com/email/v1/users/me/messages?maxResults=25&q=${query}`
   );
 
   let processed = 0;
@@ -218,7 +218,7 @@ async function syncGmail(
       .from("external_signals")
       .select("id")
       .eq("user_id", userId)
-      .eq("source", "gmail")
+      .eq("source", "email")
       .eq("external_id", item.id)
       .maybeSingle();
 
@@ -226,7 +226,7 @@ async function syncGmail(
 
     const message = await googleFetch(
       token,
-      `https://gmail.googleapis.com/gmail/v1/users/me/messages/${item.id}?format=full`
+      `https://email.googleapis.com/email/v1/users/me/messages/${item.id}?format=full`
     );
 
     const subject = header(message.payload, "Subject");
@@ -263,7 +263,7 @@ async function syncGmail(
       .insert({
         user_id: userId,
         application_id: application.id,
-        source: "gmail",
+        source: "email",
         external_id: item.id,
         signal_type: signalType,
         title: subject,
@@ -295,7 +295,7 @@ async function syncGmail(
         application,
         signalId: signal.id,
         signalType,
-        source: "gmail",
+        source: "email",
         detail:
           extracted?.conciseSummary ||
           `Email detected: ${subject || "Employer message"}`,
@@ -309,7 +309,7 @@ async function syncGmail(
       await upsertInterview({
         userId,
         applicationId: application.id,
-        source: "gmail",
+        source: "email",
         externalId: item.id,
         signalId: signal.id,
         stage: extracted?.stage,
@@ -474,8 +474,8 @@ export async function syncGoogleForUser(userId: string) {
 
     const tracked = (applications || []) as TrackedApplication[];
 
-    const [gmailCount, calendarCount] = await Promise.all([
-      syncGmail(userId, token, tracked),
+    const [emailCount, calendarCount] = await Promise.all([
+      syncEmail(userId, token, tracked),
       syncCalendar(userId, token, tracked),
     ]);
 
@@ -490,7 +490,7 @@ export async function syncGoogleForUser(userId: string) {
       updated_at: new Date().toISOString(),
     });
 
-    return { gmailCount, calendarCount };
+    return { emailCount, calendarCount };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Google sync failed.";
