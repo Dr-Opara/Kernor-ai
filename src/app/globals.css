@@ -597,3 +597,124 @@ button, input, textarea { font: inherit; }
     align-items: flex-start;
   }
 }
+
+
+.track-toolbar {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px auto;
+  gap: 10px;
+}
+.track-list { margin-top: 16px; overflow: hidden; }
+.track-list-row {
+  display: grid;
+  grid-template-columns: 1.3fr .65fr .65fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 20px 22px;
+}
+.track-list-row:hover { background: #fafaf8; }
+.track-list-meta { font-size: 13px; }
+.track-status-pill {
+  display: inline-flex;
+  justify-content: center;
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #f3f3ef;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+.track-detail-heading {
+  margin-top: 26px;
+  display: flex;
+  justify-content: space-between;
+  gap: 26px;
+  align-items: flex-end;
+}
+.track-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 26px;
+}
+.track-summary-card {
+  padding: 21px;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.track-summary-card strong {
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+.track-interview-card {
+  margin-top: 14px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+}
+.track-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0,1.35fr) minmax(280px,.65fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 30px;
+}
+.track-timeline { overflow: hidden; }
+.track-event {
+  padding: 19px 21px;
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 12px;
+}
+.track-event-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 5px;
+}
+.track-source {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.track-status-card {
+  padding: 23px;
+  display: grid;
+  gap: 18px;
+}
+.track-note {
+  min-height: 94px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+.track-context-card {
+  margin-top: 14px;
+  padding: 22px;
+}
+
+@media (max-width: 780px) {
+  .track-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .track-list-row {
+    grid-template-columns: 1fr auto;
+  }
+  .track-list-meta {
+    display: none;
+  }
+  .track-detail-heading,
+  .track-interview-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .track-summary-grid,
+  .track-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
