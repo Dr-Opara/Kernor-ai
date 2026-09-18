@@ -125,3 +125,32 @@ export const resumeTailoringOutputSchema = z.object({
 
 export type TailoredResume = z.infer<typeof tailoredResumeSchema>;
 export type ResumeTailoringOutput = z.infer<typeof resumeTailoringOutputSchema>;
+
+
+export const interviewReadinessSchema = z.object({
+  executiveBrief: z.string(),
+  interviewGoal: z.string(),
+  focusAreas: z.array(z.object({
+    topic: z.string(),
+    whyItMatters: z.string(),
+    verifiedEvidence: z.array(z.string()),
+  })).max(8),
+  likelyTopicAreas: z.array(z.object({
+    topic: z.string(),
+    rationale: z.string(),
+  })).max(8),
+  experienceExamples: z.array(z.object({
+    label: z.string(),
+    situation: z.string(),
+    action: z.string(),
+    result: z.string().nullable(),
+    sourceEvidence: z.array(z.string()),
+  })).max(8),
+  questionsToAsk: z.array(z.string()).max(8),
+  gapsToHandleHonestly: z.array(z.object({
+    gap: z.string(),
+    approach: z.string(),
+  })).max(6),
+});
+
+export type InterviewReadiness = z.infer<typeof interviewReadinessSchema>;

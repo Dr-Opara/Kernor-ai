@@ -290,3 +290,31 @@ Email and Calendar are separate connection types. A user can connect Yahoo for e
 OAuth providers use Vercel Connect. iCloud/custom IMAP secrets are stored in Supabase Vault; normal application tables store only the Vault secret reference.
 
 The normalized downstream signal type is always either `email` or `calendar`; provider identity is stored separately.
+
+
+## Interview Workspace v0.8
+
+The Interview Workspace is free and does not consume a Kernor Live pass.
+
+It combines:
+- detected meeting date/time/platform/link
+- interviewer details when available
+- frozen application context
+- exact submitted resume
+- frozen job description
+- application timeline
+- interview type
+- preferred response style
+- preferred response length
+- expected duration
+- evidence-grounded readiness briefing
+
+Readiness can generate:
+- interview goal
+- focus areas
+- likely topic areas suggested by the role/stage
+- verified experience examples
+- questions to ask
+- gaps to handle honestly
+
+Kernor does not run mock interviews in this phase.
