@@ -31,7 +31,7 @@ export default async function DashboardPage() {
     <main>
       <header className="app-header">
         <div className="shell app-header-inner">
-          <Link href="/" className="wordmark">Kernor</Link>
+          <Link href="/" className="wordmark">Odysseus</Link>
           <nav className="app-nav">
             <Link href="/dashboard">Home</Link>
             <Link href="/applications">Applications</Link>
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
           <div>
             <h1 style={{ fontSize: 46, letterSpacing: "-0.05em", margin: 0 }}>Good to see you, {firstName(profile?.full_name)}.</h1>
             <p className="muted" style={{ fontSize: 18, marginTop: 12 }}>
-              {bestJob || applications?.length || nextInterview ? "Here’s what needs your attention." : "Kernor is ready for your first move."}
+              {bestJob || applications?.length || nextInterview ? "Here’s what needs your attention." : "Odysseus is ready for your first move."}
             </p>
           </div>
           <Link className="btn btn-primary" href="/match">Check a job</Link>
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
                 <div className="badge">Ready when you are</div>
                 <h2 style={{ fontSize: 30, margin: "18px 0 8px" }}>Find your first strong match.</h2>
                 <p className="muted" style={{ maxWidth: 520, lineHeight: 1.6 }}>
-                  Kernor will only surface roles that fit the profile and preferences you approved.
+                  Odysseus will only surface roles that fit the profile and preferences you approved.
                 </p>
                 <Link className="btn btn-primary" href="/match" style={{ marginTop: 14 }}>Check a job</Link>
               </div>
