@@ -35,7 +35,7 @@ export default function MarketingNav() {
 
         <div className="marketing-nav-actions">
           <Link className="btn btn-secondary" href="/login">Sign In</Link>
-          <Link className="btn btn-primary" href="/onboarding">Get Started →</Link>
+          <Link className="btn btn-primary" href="/signup">Get Started →</Link>
         </div>
 
         <button
@@ -60,7 +60,7 @@ export default function MarketingNav() {
             <Link className="btn btn-secondary" href="/login" onClick={() => setOpen(false)}>
               Sign In
             </Link>
-            <Link className="btn btn-primary" href="/onboarding" onClick={() => setOpen(false)}>
+            <Link className="btn btn-primary" href="/signup" onClick={() => setOpen(false)}>
               Get Started →
             </Link>
           </div>

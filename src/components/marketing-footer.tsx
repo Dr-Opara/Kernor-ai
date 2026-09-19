@@ -27,7 +27,7 @@ export default function MarketingFooter() {
         <div className="marketing-footer-col">
           <div className="marketing-footer-heading">Account</div>
           <Link href="/login">Sign In</Link>
-          <Link href="/onboarding">Get Started</Link>
+          <Link href="/signup">Get Started</Link>
         </div>
       </div>
 

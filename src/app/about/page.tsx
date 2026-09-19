@@ -123,7 +123,7 @@ export default function AboutPage() {
             <h2 style={{ fontSize: 24, margin: "0 0 6px" }}>See it for yourself.</h2>
             <p className="muted" style={{ margin: 0 }}>Upload your resume and see your first matches.</p>
           </div>
-          <Link className="btn btn-primary" href="/onboarding">Get Started Free →</Link>
+          <Link className="btn btn-primary" href="/signup">Get Started Free →</Link>
         </div>
       </section>
 

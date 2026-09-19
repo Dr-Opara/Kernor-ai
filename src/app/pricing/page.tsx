@@ -116,17 +116,17 @@ export default function PricingPage() {
             <div className="bundle-option">
               <div className="bundle-option-quantity">25 credits</div>
               <div className="bundle-option-price">$20</div>
-              <Link className="btn btn-secondary" href="/onboarding">Get Started →</Link>
+              <Link className="btn btn-secondary" href="/signup">Get Started →</Link>
             </div>
             <div className="bundle-option is-featured">
               <div className="bundle-option-quantity">50 credits</div>
               <div className="bundle-option-price">$35</div>
-              <Link className="btn btn-primary" href="/onboarding">Get Started →</Link>
+              <Link className="btn btn-primary" href="/signup">Get Started →</Link>
             </div>
             <div className="bundle-option">
               <div className="bundle-option-quantity">100 credits</div>
               <div className="bundle-option-price">$59</div>
-              <Link className="btn btn-secondary" href="/onboarding">Get Started →</Link>
+              <Link className="btn btn-secondary" href="/signup">Get Started →</Link>
             </div>
           </div>
 
@@ -155,13 +155,13 @@ export default function PricingPage() {
             <div className="bundle-option">
               <div className="bundle-option-quantity">3 Odysseus Live Passes</div>
               <div className="bundle-option-price">$59.99</div>
-              <Link className="btn btn-secondary" href="/onboarding">Get Started →</Link>
+              <Link className="btn btn-secondary" href="/signup">Get Started →</Link>
             </div>
             <div className="bundle-option is-featured">
               <div className="bundle-option-quantity">Odysseus Live Annual</div>
               <div className="bundle-option-price">$499</div>
               <div className="bundle-option-unit">per year</div>
-              <Link className="btn btn-primary" href="/onboarding">Get Started →</Link>
+              <Link className="btn btn-primary" href="/signup">Get Started →</Link>
             </div>
           </div>
 
@@ -204,7 +204,7 @@ export default function PricingPage() {
             <h2 style={{ fontSize: 24, margin: "0 0 6px" }}>Ready to start?</h2>
             <p className="muted" style={{ margin: 0 }}>No subscription. Pay only when Odysseus works for you.</p>
           </div>
-          <Link className="btn btn-primary" href="/onboarding">Get Started Free →</Link>
+          <Link className="btn btn-primary" href="/signup">Get Started Free →</Link>
         </div>
       </section>
 

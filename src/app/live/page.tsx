@@ -33,7 +33,7 @@ export default function LivePage() {
           The resume you submitted, the job you applied to, and everything Odysseus prepared — all in one place when it matters.
         </p>
         <div className="hero-ctas" style={{ marginTop: 26 }}>
-          <Link className="btn btn-primary" href="/onboarding">Get Started Free →</Link>
+          <Link className="btn btn-primary" href="/signup">Get Started Free →</Link>
         </div>
       </section>
 
@@ -139,7 +139,7 @@ export default function LivePage() {
           <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-0.05em" }}>$24.99</div>
           <p className="muted" style={{ margin: "6px 0 18px" }}>per live interview</p>
           <h2 style={{ fontSize: 24, margin: "0 0 20px" }}>One interview. One pass. Everything included.</h2>
-          <Link className="btn btn-primary" href="/onboarding">Get Started Free →</Link>
+          <Link className="btn btn-primary" href="/signup">Get Started Free →</Link>
         </div>
       </section>
 

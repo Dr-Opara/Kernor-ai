@@ -63,7 +63,7 @@ export default function Home() {
             Odysseus finds strong-match jobs, tailors your resume, applies across supported platforms, and tracks every application — then prepares you for the interview and stays with you live when it begins.
           </p>
           <div className="hero-ctas">
-            <Link className="btn btn-primary" href="/onboarding">Get Started Free →</Link>
+            <Link className="btn btn-primary" href="/signup">Get Started Free →</Link>
             <Link className="btn btn-secondary" href="/how-it-works">See How It Works</Link>
           </div>
         </div>
