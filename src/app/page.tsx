@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 function Logo() {
-  return <Link href="/" style={{fontSize:22,fontWeight:800,letterSpacing:"-0.04em"}}>Kernor</Link>;
+  return <Link href="/" style={{fontSize:22,fontWeight:800,letterSpacing:"-0.04em"}}>Odysseus</Link>;
 }
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
             Your next move, handled.
           </h1>
           <p className="muted" style={{fontSize:21,lineHeight:1.55,maxWidth:620,marginBottom:32}}>
-            Kernor finds strong-fit roles, tailors your resume, applies after your approval, tracks every application, and stays with you through the interview.
+            Odysseus finds strong-fit roles, tailors your resume, applies after your approval, tracks every application, and stays with you through the interview.
           </p>
           <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
             <Link className="btn btn-primary" href="/onboarding">Start with your resume</Link>
@@ -49,7 +49,7 @@ export default function Home() {
           </div>
           <div style={{marginTop:22,padding:18,borderRadius:14,background:"#f5f5f2"}}>
             <strong>Your resume can be stronger for this role.</strong>
-            <p className="muted" style={{margin:"7px 0 0",fontSize:14}}>Kernor found 7 improvements based on your verified experience.</p>
+            <p className="muted" style={{margin:"7px 0 0",fontSize:14}}>Odysseus found 7 improvements based on your verified experience.</p>
           </div>
         </div>
       </section>
@@ -61,9 +61,9 @@ export default function Home() {
         </div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14}}>
           {[
-            ["01","Find","Kernor surfaces the roles worth your attention."],
+            ["01","Find","Odysseus surfaces the roles worth your attention."],
             ["02","Review","See your match and approve tailored resume changes."],
-            ["03","Apply","Kernor handles the application after you approve it."],
+            ["03","Apply","Odysseus handles the application after you approve it."],
             ["04","Interview","Your submitted resume and job context follow you into the interview."]
           ].map(([n,t,d])=>(
             <div className="card" key={n} style={{padding:24}}>

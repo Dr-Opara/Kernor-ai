@@ -38,7 +38,7 @@ export default async function BillingPage({
 
   return (
     <main className="shell" style={{ padding: "54px 0 100px" }}>
-      <Link href="/dashboard" className="wordmark">Kernor</Link>
+      <Link href="/dashboard" className="wordmark">Odysseus</Link>
 
       <div style={{ width: "min(980px,100%)", margin: "64px auto 0" }}>
         <div>
@@ -77,7 +77,7 @@ export default async function BillingPage({
           <div className="card billing-balance-card">
             <div className="muted" style={{ fontSize: 13 }}>Interview passes</div>
             <strong>{credits?.interview_passes ?? 0}</strong>
-            <span className="muted">One pass is used when Kernor Live starts.</span>
+            <span className="muted">One pass is used when Odysseus Live starts.</span>
           </div>
         </div>
 
@@ -108,7 +108,7 @@ export default async function BillingPage({
 
         <section className="card interview-pass-card">
           <div>
-            <div className="muted" style={{ fontSize: 13 }}>Kernor Live</div>
+            <div className="muted" style={{ fontSize: 13 }}>Odysseus Live</div>
             <h2 style={{ fontSize: 28, margin: "7px 0 7px" }}>1 interview pass · $19.99</h2>
             <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>
               Buy it now or wait until an interview is scheduled. The pass remains unused until the live assistant starts.

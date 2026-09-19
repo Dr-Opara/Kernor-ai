@@ -1,6 +1,6 @@
-# Kernor Engineering Guide
+# Odysseus Engineering Guide
 
-Kernor is a calm AI career product. The user journey is:
+Odysseus is a calm AI career product. The user journey is:
 
 Find -> Match -> Tailor -> Approve -> Apply -> Track -> Interview -> Follow up
 
@@ -83,11 +83,11 @@ Avoid robotic language:
 ## Current milestones
 
 v0.1: foundation, auth, onboarding, dashboard
-v0.2: Kernor Match
-v0.3: resume tailoring, diff review, explicit approval\nv0.4: credits + Stripe billing\nv0.5: Kernor Apply assisted browser workflow\nv0.6: Kernor Track application lifecycle
+v0.2: Odysseus Match
+v0.3: resume tailoring, diff review, explicit approval\nv0.4: credits + Stripe billing\nv0.5: Odysseus Apply assisted browser workflow\nv0.6: Odysseus Track application lifecycle
 v0.7: provider-neutral Email + Calendar detection\nv0.8: Interview Workspace / Readiness
 v0.9: Multi-Round Interview Memory
-v0.10: Kernor Live realtime interview assistant
+v0.10: Odysseus Live realtime interview assistant
 v0.11: Post-Interview Analysis + Follow-Up
 
 Next expected milestone:
@@ -134,3 +134,13 @@ Next expected milestone:
 - Preserve user-entered round notes when merging transcript-derived memory.
 - Follow-up drafts require user review/approval before send.
 - Outbound email authorization must remain separate from read-only detection permissions.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
