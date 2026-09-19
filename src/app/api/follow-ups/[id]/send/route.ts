@@ -103,8 +103,8 @@ export async function POST(
 
     return NextResponse.json({ ok: true, sent: true, provider });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Follow-up send failed.";
+    console.error("Kernor follow-up send failed:", error);
+    const message = "Kernor could not send this follow-up.";
 
     await service
       .from("follow_up_drafts")

@@ -119,6 +119,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ runId: run.id });
   } catch (error) {
+    console.error("Kernor Apply could not start:", error);
+
     await service
       .from("application_runs")
       .update({
@@ -130,7 +132,7 @@ export async function POST(request: Request) {
       .eq("id", run.id);
 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Kernor could not start Apply." },
+      { error: "Kernor could not start Apply." },
       { status: 500 }
     );
   }

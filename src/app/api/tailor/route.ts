@@ -121,8 +121,9 @@ export async function POST(request: Request) {
       version: tailoring.version_number,
     });
   } catch (error) {
+    console.error("Kernor Resume tailoring failed:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Kernor could not tailor this resume." },
+      { error: "Kernor could not tailor this resume." },
       { status: 500 }
     );
   }

@@ -30,11 +30,8 @@ export async function parseResume(input: {
         description: "Verified professional facts extracted from a resume.",
         schema: resumeProfileSchema,
       }),
-      messages: [
-        {
-          role: "system",
-          content: instructions,
-        },
+      system: instructions,
+      prompt: [
         {
           role: "user",
           content: [

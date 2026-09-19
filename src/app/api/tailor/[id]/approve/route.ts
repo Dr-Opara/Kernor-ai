@@ -113,8 +113,9 @@ export async function POST(
 
     return NextResponse.json({ resumeId: approvedResume.id });
   } catch (error) {
+    console.error("Kernor Resume approval failed:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Kernor could not approve this resume." },
+      { error: "Kernor could not approve this resume." },
       { status: 500 }
     );
   }

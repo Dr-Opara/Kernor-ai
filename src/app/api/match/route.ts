@@ -148,9 +148,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ id: job.id, score: job.match_score });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Kernor could not analyze this role.";
-
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("Kernor Match failed:", error);
+    return NextResponse.json({ error: "Kernor could not analyze this role." }, { status: 500 });
   }
 }

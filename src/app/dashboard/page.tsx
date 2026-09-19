@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { logout } from "@/app/login/actions";
 
 function firstName(name?: string | null) {
   return name?.trim().split(/\s+/)[0] || "there";
@@ -39,7 +40,12 @@ export default async function DashboardPage() {
           </nav>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <Link href="/billing" className="muted credit-link" style={{ fontSize: 14 }}>{credits?.application_credits ?? 0} credits</Link>
-            <div className="avatar">{firstName(profile?.full_name).slice(0, 1).toUpperCase()}</div>
+            <div className="avatar" title={profile?.full_name || undefined}>{firstName(profile?.full_name).slice(0, 1).toUpperCase()}</div>
+            <form action={logout}>
+              <button type="submit" className="muted" style={{ fontSize: 14, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                Log out
+              </button>
+            </form>
           </div>
         </div>
       </header>
