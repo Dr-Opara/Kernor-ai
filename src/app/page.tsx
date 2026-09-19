@@ -1,111 +1,205 @@
 import Link from "next/link";
+import MarketingNav from "@/components/marketing-nav";
 
-function Logo() {
-  return <Link href="/" style={{fontSize:22,fontWeight:800,letterSpacing:"-0.04em"}}>Odysseus</Link>;
-}
+const platforms = [
+  "Workday",
+  "Indeed",
+  "Greenhouse",
+  "Lever",
+  "Ashby",
+  "iCIMS",
+  "UN Careers",
+  "Direct Company Career Sites",
+];
+
+const activityMoments = [
+  "Found 6 strong matches",
+  "Resume tailored",
+  "Waiting for your approval",
+  "Application submitted ✓",
+  "Interview detected",
+];
+
+const howItWorks = [
+  {
+    id: undefined,
+    n: "01",
+    title: "Build Your Profile",
+    body: "Upload your resume once. Odysseus learns your verified experience, skills, education, certifications, and preferences.",
+    pills: [],
+  },
+  {
+    id: undefined,
+    n: "02",
+    title: "Find Your Matches",
+    body: "Odysseus finds relevant opportunities and explains why they fit.",
+    pills: ["85%+ Match", "Hard Requirements Checked", "No Fabricated Qualifications"],
+  },
+  {
+    id: "apply",
+    n: "03",
+    title: "Review & Apply",
+    body: "Odysseus tailors the resume and prepares the application for approval.",
+    pills: ["ATS-Ready Resume", "Cover Letter When Needed", "Cross-Platform Applications", "$0.99 Only After Successful Submission"],
+  },
+  {
+    id: "live",
+    n: "04",
+    title: "Interview",
+    body: "Employer responses flow into the Interview Workspace.",
+    pills: ["Free Interview Preparation", "Odysseus Live", "Multi-Round Memory", "Post-Interview Follow-Up"],
+  },
+];
 
 export default function Home() {
   return (
-    <main>
-      <header className="shell" style={{height:76,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <Logo />
-        <nav style={{display:"flex",gap:10,alignItems:"center"}}>
-          <Link className="btn btn-secondary" href="/login">Sign in</Link>
-          <Link className="btn btn-primary" href="/onboarding">Get started</Link>
-        </nav>
-      </header>
+    <main className="marketing">
+      <div className="shell" style={{ paddingTop: 16 }}>
+        <MarketingNav />
+      </div>
 
-      <section className="shell" style={{padding:"110px 0 90px",display:"grid",gridTemplateColumns:"1.1fr .9fr",gap:70,alignItems:"center"}}>
+      <section className="shell hero-section">
         <div>
           <div className="badge">A calmer way to move your career forward</div>
-          <h1 style={{fontSize:"clamp(54px,8vw,92px)",lineHeight:.95,letterSpacing:"-0.065em",margin:"26px 0 28px",maxWidth:780}}>
-            Your next move, handled.
-          </h1>
-          <p className="muted" style={{fontSize:21,lineHeight:1.55,maxWidth:620,marginBottom:32}}>
-            Odysseus finds strong-fit roles, tailors your resume, applies after your approval, tracks every application, and stays with you through the interview.
+          <h1 className="font-display hero-headline">Your next move, handled.</h1>
+          <p className="muted hero-copy">
+            Odysseus finds strong-match jobs, tailors your resume, applies across supported platforms, and tracks every application — then prepares you for the interview and stays with you live when it begins.
           </p>
-          <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-            <Link className="btn btn-primary" href="/onboarding">Start with your resume</Link>
-            <Link className="btn btn-secondary" href="/dashboard">View dashboard</Link>
+          <div className="hero-ctas">
+            <Link className="btn btn-primary" href="/onboarding">Get Started Free →</Link>
+            <a className="btn btn-secondary" href="#how-it-works">See How It Works</a>
           </div>
-          <p className="muted" style={{fontSize:14,marginTop:18}}>$0.99 per successful application · $24.99 per live interview · no subscription</p>
         </div>
 
-        <div className="card" style={{padding:26,boxShadow:"0 24px 70px rgba(20,20,20,.07)"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
-            <div>
-              <div className="muted" style={{fontSize:13}}>Recommended for you</div>
-              <div style={{fontSize:20,fontWeight:750,marginTop:5}}>Senior GRC Manager</div>
-              <div className="muted" style={{marginTop:4}}>Aperture Systems · Remote</div>
+        <div className="card agent-visual">
+          <div className="agent-visual-score">94% Match</div>
+          <div className="agent-visual-role">Senior Compliance Analyst</div>
+          <div className="muted" style={{ marginTop: 2 }}>Remote</div>
+
+          <div className="agent-visual-status">
+            <span className="agent-visual-dot" />
+            <span>Odysseus Agent — Active</span>
+          </div>
+
+          <div className="agent-visual-steps">
+            <div className="agent-visual-step">
+              <span className="agent-visual-check">✓</span> Strong match found
             </div>
-            <div style={{fontSize:28,fontWeight:800}}>94%</div>
-          </div>
-          <div style={{display:"grid",gap:10}}>
-            {["Experience","Cybersecurity & GRC","Certifications","Remote preference"].map((item)=>
-              <div key={item} style={{display:"flex",justifyContent:"space-between",padding:"14px 0",borderTop:"1px solid var(--line)"}}>
-                <span>{item}</span><span style={{color:"var(--accent)",fontWeight:700}}>Strong</span>
-              </div>
-            )}
-          </div>
-          <div style={{marginTop:22,padding:18,borderRadius:14,background:"#f5f5f2"}}>
-            <strong>Your resume can be stronger for this role.</strong>
-            <p className="muted" style={{margin:"7px 0 0",fontSize:14}}>Odysseus found 7 improvements based on your verified experience.</p>
+            <div className="agent-visual-step">
+              <span className="agent-visual-check">✓</span> Resume tailored
+            </div>
+            <div className="agent-visual-step">
+              <span className="agent-visual-check">✓</span> Cover letter prepared
+            </div>
+            <div className="agent-visual-step">
+              <span className="agent-visual-check">✓</span> Application approved
+            </div>
+            <div className="agent-visual-step active-step">
+              <span>→</span> Applying on Workday...
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="shell" style={{padding:"30px 0 110px"}}>
-        <div style={{textAlign:"center",marginBottom:36}}>
-          <p className="muted" style={{fontSize:14,fontWeight:700,textTransform:"uppercase",letterSpacing:".12em"}}>One simple flow</p>
-          <h2 style={{fontSize:42,letterSpacing:"-0.04em",margin:"10px 0"}}>Find → Review → Apply → Interview</h2>
+      <section className="shell platform-strip-section">
+        <div style={{ textAlign: "center", marginBottom: 30 }}>
+          <h2 className="font-display" style={{ fontSize: 34, letterSpacing: "-0.02em", margin: 0 }}>
+            Apply wherever the opportunity lives
+          </h2>
+          <p className="muted" style={{ marginTop: 10 }}>
+            One Odysseus. Across supported job boards and employer career sites.
+          </p>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14}}>
-          {[
-            ["01","Find","Odysseus surfaces the roles worth your attention."],
-            ["02","Review","See your match and approve tailored resume changes."],
-            ["03","Apply","Odysseus handles the application after you approve it."],
-            ["04","Interview","Your submitted resume and job context follow you into the interview."]
-          ].map(([n,t,d])=>(
-            <div className="card" key={n} style={{padding:24}}>
-              <div className="muted" style={{fontSize:13}}>{n}</div>
-              <h3 style={{fontSize:22,margin:"28px 0 8px"}}>{t}</h3>
-              <p className="muted" style={{lineHeight:1.55,margin:0}}>{d}</p>
+        <div className="platform-strip-track-wrap">
+          <div className="platform-strip-track">
+            {[...platforms, ...platforms].map((platform, index) => (
+              <span className="platform-strip-item" key={`${platform}-${index}`}>{platform}</span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="shell" style={{ padding: "10px 0 30px" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <p className="muted" style={{ fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".12em" }}>
+            How Odysseus Works
+          </p>
+          <h2 className="font-display" style={{ fontSize: 40, letterSpacing: "-0.02em", margin: "10px 0" }}>
+            One calm flow, start to offer.
+          </h2>
+        </div>
+
+        <div className="how-it-works-grid">
+          {howItWorks.map((step) => (
+            <div className="card how-it-works-card" id={step.id} key={step.n}>
+              <div className="how-it-works-number">{step.n}</div>
+              <h3 style={{ fontSize: 21, margin: "16px 0 8px" }}>{step.title}</h3>
+              <p className="muted" style={{ lineHeight: 1.55, margin: 0 }}>{step.body}</p>
+              {step.pills.length ? (
+                <div className="how-it-works-pills">
+                  {step.pills.map((pill) => (
+                    <span className="how-it-works-pill" key={pill}>{pill}</span>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
       </section>
 
-      <section className="shell" style={{padding:"30px 0 110px"}}>
-        <div style={{textAlign:"center",marginBottom:36}}>
-          <p className="muted" style={{fontSize:14,fontWeight:700,textTransform:"uppercase",letterSpacing:".12em"}}>Pricing</p>
-          <h2 style={{fontSize:42,letterSpacing:"-0.04em",margin:"10px 0"}}>No subscription. Pay when Odysseus works for you.</h2>
+      <section className="shell activity-strip-section">
+        <div className="activity-strip">
+          {activityMoments.map((moment) => (
+            <span className="activity-chip" key={moment}>{moment}</span>
+          ))}
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-          <div className="card" style={{padding:28}}>
-            <div style={{fontSize:44,fontWeight:800,letterSpacing:"-0.05em"}}>$0.99</div>
-            <h3 style={{fontSize:22,margin:"10px 0 12px"}}>Apply with Odysseus</h3>
-            <p className="muted" style={{lineHeight:1.6,margin:"0 0 12px"}}>
-              Odysseus matches the role, tailors your resume, completes the application, submits it, and tracks it.
-            </p>
-            <p className="muted" style={{lineHeight:1.6,margin:"0 0 16px"}}>
-              $0.99 only after successful submission.
-            </p>
-            <p className="muted" style={{fontSize:14,lineHeight:1.6,margin:0}}>
-              Apply across supported job boards and direct employer career sites — no platform-specific fee. Includes Workday, Indeed, UN Careers / UN job portals, Greenhouse, Lever, Ashby, iCIMS, direct company career websites, corporate ATS portals, and other supported job boards and employer application sites.
+      </section>
+
+      <section id="pricing" className="shell" style={{ padding: "10px 0 110px" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <p className="muted" style={{ fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".12em" }}>
+            Pricing
+          </p>
+          <h2 className="font-display" style={{ fontSize: 40, letterSpacing: "-0.02em", margin: "10px 0" }}>
+            No subscription. Pay when Odysseus works for you.
+          </h2>
+        </div>
+
+        <div className="pricing-preview-grid">
+          <div className="card" style={{ padding: 28 }}>
+            <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-0.05em" }}>$0.99</div>
+            <h3 style={{ fontSize: 22, margin: "10px 0 4px" }}>Apply with Odysseus</h3>
+            <p className="pricing-flow-chain">Match → Tailor → Apply → Track</p>
+            <p className="muted" style={{ lineHeight: 1.6, margin: 0 }}>
+              Charged only after successful submission.
             </p>
           </div>
-          <div className="card" style={{padding:28}}>
-            <div style={{fontSize:44,fontWeight:800,letterSpacing:"-0.05em"}}>$24.99</div>
-            <h3 style={{fontSize:22,margin:"10px 0 12px"}}>Odysseus Live</h3>
-            <p className="muted" style={{lineHeight:1.6,margin:"0 0 12px"}}>
-              Your AI interview companion—from preparation through follow-up.
-            </p>
-            <p className="muted" style={{lineHeight:1.6,margin:0}}>
+          <div className="card" style={{ padding: 28 }}>
+            <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-0.05em" }}>$24.99</div>
+            <h3 style={{ fontSize: 22, margin: "10px 0 4px" }}>Odysseus Live</h3>
+            <p className="pricing-flow-chain">Prepare → Live Guidance → Transcript → Analysis → Follow-Up</p>
+            <p className="muted" style={{ lineHeight: 1.6, margin: 0 }}>
               One interview. One pass. Everything included.
             </p>
           </div>
         </div>
       </section>
+
+      <section id="about" className="shell about-section">
+        <div className="about-inner">
+          <h2 className="font-display" style={{ fontSize: 34, letterSpacing: "-0.02em", margin: "0 0 16px" }}>
+            About Odysseus
+          </h2>
+          <p className="muted" style={{ lineHeight: 1.7 }}>
+            Odysseus is a calm, AI-assisted career workspace built to remove the busywork of job searching. It matches you to strong-fit roles, tailors your resume with your approval, applies on your behalf across supported job boards and employer career sites, and stays with you from the first interview question through the final follow-up — grounded only in your verified experience.
+          </p>
+        </div>
+      </section>
+
+      <footer className="shell marketing-footer">
+        <div className="marketing-wordmark">ODYSSEUS</div>
+        <p className="muted" style={{ fontSize: 13, margin: 0 }}>Your next move, handled.</p>
+      </footer>
     </main>
   );
 }
