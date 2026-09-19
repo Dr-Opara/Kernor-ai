@@ -11,7 +11,7 @@ export default function Home() {
         <Logo />
         <nav style={{display:"flex",gap:10,alignItems:"center"}}>
           <Link className="btn btn-secondary" href="/login">Sign in</Link>
-          <Link className="btn btn-primary" href="/onboarding">Get started</Link>
+          <Link className="btn btn-primary" href="/signup">Get started</Link>
         </nav>
       </header>
 
@@ -25,7 +25,7 @@ export default function Home() {
             Kernor finds strong-fit roles, tailors your resume, applies after your approval, tracks every application, and stays with you through the interview.
           </p>
           <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-            <Link className="btn btn-primary" href="/onboarding">Start with your resume</Link>
+            <Link className="btn btn-primary" href="/signup">Start with your resume</Link>
             <Link className="btn btn-secondary" href="/dashboard">View dashboard</Link>
           </div>
           <p className="muted" style={{fontSize:14,marginTop:18}}>$1 per successful application · $19.99 per live interview · no subscription</p>
