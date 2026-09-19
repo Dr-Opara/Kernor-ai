@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kernor — Your next move, handled.",
+  title: "Odysseus — Your next move, handled.",
   description: "Discover, tailor, apply, track, and interview with one calm career workspace.",
 };
 
