@@ -65,8 +65,10 @@ Do not add Supabase secret/service-role keys to browser environment variables.
 
 ## Pricing direction
 
-- $1 per successfully submitted application
-- $19.99 per live interview
+No subscription. Pay when Odysseus works for you.
+
+- $0.99 per successfully submitted application, across supported job boards and direct employer career sites (Workday, Indeed, UN Careers / UN job portals, Greenhouse, Lever, Ashby, iCIMS, direct company career websites, corporate ATS portals, and other supported job boards/employer application sites) — no platform-specific fee
+- $24.99 per successfully activated Odysseus Live interview session
 - No required subscription
 
 ## Next milestone
@@ -140,18 +142,16 @@ See `docs/development/codex.md` for the recommended VS Code + Codex workflow.
 
 Billing adds prepaid application credits and interview passes without a subscription.
 
-### Application credit packs
+### Application credit
 
-- 10 credits — $10
-- 25 credits — $25
-- 50 credits — $45
-- 100 credits — $80
+- 1 application credit — $0.99
+- Covers a successful submission across any supported job board or employer career site (Workday, Indeed, UN Careers / UN job portals, Greenhouse, Lever, Ashby, iCIMS, direct company career websites, corporate ATS portals, and other supported job boards/employer application sites) — no platform-specific fee
 
-Application credits are not consumed at purchase time. The future Apply workflow will consume one credit only after a successful application submission.
+Application credits are not consumed at purchase time. The Apply workflow consumes one credit only after a successful application submission.
 
 ### Interview pass
 
-- 1 Odysseus Live interview pass — $19.99
+- 1 Odysseus Live interview pass — $24.99
 - Workspace setup remains free
 - The pass will be consumed only when the live interview assistant starts
 
@@ -184,6 +184,10 @@ Odysseus Apply is an assisted, human-in-the-loop application browser.
 8. Odysseus pauses again before final submission.
 9. Candidate explicitly presses **Submit application**.
 10. One application credit is consumed only after a success confirmation is detected.
+
+### Coverage
+
+Odysseus applies across supported job boards and direct employer career sites, including Workday, Indeed, UN Careers / UN job portals, Greenhouse, Lever, Ashby, iCIMS, direct company career websites, corporate ATS portals, and other supported job boards/employer application sites — at the same $0.99 price regardless of which platform the job is on. This is not a claim of universal technical compatibility with every site; coverage is scoped to supported job boards and employer career sites.
 
 ### Browser runtime
 

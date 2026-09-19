@@ -47,10 +47,11 @@ Find -> Match -> Tailor -> Approve -> Apply -> Track -> Interview -> Follow up
 
 ## Billing rules
 
-- Application pricing direction: $1 per successfully submitted application.
-- Failed/unsupported application attempts should not consume an application credit.
+- No subscription. Pay when Odysseus works for you.
+- Application pricing direction: $0.99 per successfully submitted application, across supported job boards and direct employer career sites (Workday, Indeed, UN Careers / UN job portals, Greenhouse, Lever, Ashby, iCIMS, direct company career websites, corporate ATS portals, and other supported job boards/employer application sites) — no platform-specific fee.
+- Failed/unsupported/paused/cancelled application attempts, closed jobs, incomplete CAPTCHA/MFA/verification, and unconfirmed submissions should not consume an application credit.
 - Interview workspace creation is free.
-- Live Interview Assistant pricing direction: $19.99 per interview.
+- Live Interview Assistant pricing direction: $24.99 per interview.
 - Interview pass should be consumed only when the live session actually starts.
 
 ## Git workflow

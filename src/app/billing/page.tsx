@@ -3,13 +3,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createCheckoutSession } from "@/app/actions/billing";
 
-const appPacks = [
-  { sku: "app_10" as const, credits: 10, price: "$10" },
-  { sku: "app_25" as const, credits: 25, price: "$25" },
-  { sku: "app_50" as const, credits: 50, price: "$45", note: "Most popular" },
-  { sku: "app_100" as const, credits: 100, price: "$80" },
-];
-
 export default async function BillingPage({
   searchParams,
 }: {
@@ -47,7 +40,7 @@ export default async function BillingPage({
             Pay for progress, not access.
           </h1>
           <p className="muted" style={{ fontSize: 18, lineHeight: 1.6, maxWidth: 650 }}>
-            No monthly subscription. Buy application credits when you need them, and activate interview passes only when an interview is actually happening.
+            No subscription. Pay when Odysseus works for you.
           </p>
         </div>
 
@@ -71,7 +64,7 @@ export default async function BillingPage({
           <div className="card billing-balance-card">
             <div className="muted" style={{ fontSize: 13 }}>Application credits</div>
             <strong>{credits?.application_credits ?? 0}</strong>
-            <span className="muted">$1 is consumed only after a successful submission.</span>
+            <span className="muted">$0.99 is consumed only after a successful submission.</span>
           </div>
 
           <div className="card billing-balance-card">
@@ -82,41 +75,38 @@ export default async function BillingPage({
         </div>
 
         <section style={{ marginTop: 34 }}>
-          <div className="muted" style={{ fontSize: 13 }}>Applications</div>
-          <h2 style={{ fontSize: 28, margin: "7px 0 18px" }}>Choose how many you want on hand.</h2>
-
           <div className="billing-pack-grid">
-            {appPacks.map((pack) => (
-              <form
-                key={pack.sku}
-                className="card billing-pack"
-                action={createCheckoutSession.bind(null, pack.sku)}
-              >
-                <div>
-                  {pack.note ? <div className="badge">{pack.note}</div> : null}
-                  <div className="muted" style={{ fontSize: 13, marginTop: pack.note ? 16 : 0 }}>
-                    Application credits
-                  </div>
-                  <div className="billing-pack-number">{pack.credits}</div>
-                  <div className="muted">{pack.price} total</div>
-                </div>
-                <button className="btn btn-primary" type="submit">Buy credits</button>
-              </form>
-            ))}
-          </div>
-        </section>
+            <form className="card billing-pack" action={createCheckoutSession.bind(null, "app_1")}>
+              <div>
+                <div className="muted" style={{ fontSize: 13 }}>Apply with Odysseus</div>
+                <div className="billing-pack-number">$0.99</div>
+                <p className="muted" style={{ lineHeight: 1.55 }}>
+                  Odysseus matches the role, tailors your resume, completes the application, submits it, and tracks it.
+                </p>
+                <p className="muted" style={{ lineHeight: 1.55 }}>
+                  $0.99 only after successful submission.
+                </p>
+                <p className="muted" style={{ fontSize: 13, lineHeight: 1.55 }}>
+                  Apply across supported job boards and direct employer career sites — no platform-specific fee. Includes Workday, Indeed, UN Careers / UN job portals, Greenhouse, Lever, Ashby, iCIMS, direct company career websites, corporate ATS portals, and other supported job boards and employer application sites.
+                </p>
+              </div>
+              <button className="btn btn-primary" type="submit">Buy an application credit</button>
+            </form>
 
-        <section className="card interview-pass-card">
-          <div>
-            <div className="muted" style={{ fontSize: 13 }}>Odysseus Live</div>
-            <h2 style={{ fontSize: 28, margin: "7px 0 7px" }}>1 interview pass · $19.99</h2>
-            <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>
-              Buy it now or wait until an interview is scheduled. The pass remains unused until the live assistant starts.
-            </p>
+            <form className="card billing-pack" action={createCheckoutSession.bind(null, "interview_1")}>
+              <div>
+                <div className="muted" style={{ fontSize: 13 }}>Odysseus Live</div>
+                <div className="billing-pack-number">$24.99</div>
+                <p className="muted" style={{ lineHeight: 1.55 }}>
+                  Your AI interview companion—from preparation through follow-up.
+                </p>
+                <p className="muted" style={{ lineHeight: 1.55 }}>
+                  One interview. One pass. Everything included.
+                </p>
+              </div>
+              <button className="btn btn-primary" type="submit">Buy an interview pass</button>
+            </form>
           </div>
-          <form action={createCheckoutSession.bind(null, "interview_1")}>
-            <button className="btn btn-primary" type="submit">Buy interview pass</button>
-          </form>
         </section>
 
         <section style={{ marginTop: 34 }}>
@@ -145,7 +135,7 @@ export default async function BillingPage({
                   <strong>{transaction.delta > 0 ? "+" : ""}{transaction.delta}</strong>
                   {transaction.amount_cents ? (
                     <div className="muted" style={{ fontSize: 13 }}>
-                      $${(transaction.amount_cents / 100).toFixed(2)}
+                      ${(transaction.amount_cents / 100).toFixed(2)}
                     </div>
                   ) : null}
                 </div>

@@ -28,7 +28,7 @@ export default function Home() {
             <Link className="btn btn-primary" href="/onboarding">Start with your resume</Link>
             <Link className="btn btn-secondary" href="/dashboard">View dashboard</Link>
           </div>
-          <p className="muted" style={{fontSize:14,marginTop:18}}>$1 per successful application · $19.99 per live interview · no subscription</p>
+          <p className="muted" style={{fontSize:14,marginTop:18}}>$0.99 per successful application · $24.99 per live interview · no subscription</p>
         </div>
 
         <div className="card" style={{padding:26,boxShadow:"0 24px 70px rgba(20,20,20,.07)"}}>
@@ -72,6 +72,38 @@ export default function Home() {
               <p className="muted" style={{lineHeight:1.55,margin:0}}>{d}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="shell" style={{padding:"30px 0 110px"}}>
+        <div style={{textAlign:"center",marginBottom:36}}>
+          <p className="muted" style={{fontSize:14,fontWeight:700,textTransform:"uppercase",letterSpacing:".12em"}}>Pricing</p>
+          <h2 style={{fontSize:42,letterSpacing:"-0.04em",margin:"10px 0"}}>No subscription. Pay when Odysseus works for you.</h2>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+          <div className="card" style={{padding:28}}>
+            <div style={{fontSize:44,fontWeight:800,letterSpacing:"-0.05em"}}>$0.99</div>
+            <h3 style={{fontSize:22,margin:"10px 0 12px"}}>Apply with Odysseus</h3>
+            <p className="muted" style={{lineHeight:1.6,margin:"0 0 12px"}}>
+              Odysseus matches the role, tailors your resume, completes the application, submits it, and tracks it.
+            </p>
+            <p className="muted" style={{lineHeight:1.6,margin:"0 0 16px"}}>
+              $0.99 only after successful submission.
+            </p>
+            <p className="muted" style={{fontSize:14,lineHeight:1.6,margin:0}}>
+              Apply across supported job boards and direct employer career sites — no platform-specific fee. Includes Workday, Indeed, UN Careers / UN job portals, Greenhouse, Lever, Ashby, iCIMS, direct company career websites, corporate ATS portals, and other supported job boards and employer application sites.
+            </p>
+          </div>
+          <div className="card" style={{padding:28}}>
+            <div style={{fontSize:44,fontWeight:800,letterSpacing:"-0.05em"}}>$24.99</div>
+            <h3 style={{fontSize:22,margin:"10px 0 12px"}}>Odysseus Live</h3>
+            <p className="muted" style={{lineHeight:1.6,margin:"0 0 12px"}}>
+              Your AI interview companion—from preparation through follow-up.
+            </p>
+            <p className="muted" style={{lineHeight:1.6,margin:0}}>
+              One interview. One pass. Everything included.
+            </p>
+          </div>
         </div>
       </section>
     </main>
